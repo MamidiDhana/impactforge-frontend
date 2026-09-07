@@ -1,0 +1,9 @@
+import type { University } from '../types'
+
+export const universities: University[] = [
+  { id: 'nit-surathkal', name: 'National Institute of Technology Karnataka', location: 'Surathkal, Karnataka', description: 'A technology-led institution with strong community innovation and engineering capabilities.', capabilities: ['Engineering', 'Water systems', 'Data science'], facultyCount: 420, activeProjects: 18, verified: true },
+  { id: 'tiss-mumbai', name: 'Tata Institute of Social Sciences', location: 'Mumbai, Maharashtra', description: 'A social sciences university focused on public policy, health, livelihoods, and inclusive development.', capabilities: ['Public policy', 'Social research', 'Healthcare'], facultyCount: 310, activeProjects: 14, verified: true },
+  { id: 'iit-bhubaneswar', name: 'Indian Institute of Technology Bhubaneswar', location: 'Bhubaneswar, Odisha', description: 'A research university connecting technical expertise with regional and civic challenges.', capabilities: ['Transport planning', 'AI and analytics', 'Climate resilience'], facultyCount: 285, activeProjects: 11, verified: true },
+  { id: 'university-of-agriculture', name: 'University of Agricultural Sciences, Dharwad', location: 'Dharwad, Karnataka', description: 'An agricultural university supporting resilient farming, rural livelihoods, and natural resource management.', capabilities: ['Agriculture', 'Rural development', 'Climate-smart farming'], facultyCount: 260, activeProjects: 9, verified: true },
+  { id: 'symbiosis-design', name: 'Symbiosis Institute of Design', location: 'Pune, Maharashtra', description: 'A design-led community of students and faculty working across service, product, and interaction design.', capabilities: ['Service design', 'Accessible design', 'User research'], facultyCount: 95, activeProjects: 7, verified: false },
+]

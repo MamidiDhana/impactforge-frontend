@@ -1,0 +1,5 @@
+import { Clock3 } from 'lucide-react'
+import { EmptyState } from '../common/EmptyState'
+interface Activity { id: string; title: string; description?: string; timestamp: string }
+interface RecentActivityProps { activities: Activity[] }
+export function RecentActivity({ activities }: RecentActivityProps) { if (!activities.length) return <EmptyState icon={Clock3} title="No recent activity" description="Updates from your work will appear here." />; return <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">{activities.map((activity) => <div key={activity.id} className="flex gap-3 p-4"><span className="mt-1.5 size-2 shrink-0 rounded-full bg-[#1c91a1]" /><div><p className="text-sm font-semibold text-slate-700">{activity.title}</p>{activity.description && <p className="mt-1 text-sm text-slate-500">{activity.description}</p>}<p className="mt-2 text-xs text-slate-400">{activity.timestamp}</p></div></div>)}</div> }

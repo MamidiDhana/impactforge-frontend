@@ -1,0 +1,50 @@
+import type { PartnerProfile } from '../types'
+
+export const partnerOrganization: PartnerProfile = {
+  name: 'CivicGrid Technologies',
+  type: 'Industry',
+  location: 'Bengaluru, Karnataka',
+  website: 'https://civicgrid.io',
+  contactPerson: 'Karan Patel (Director of Strategic Partnerships)',
+  email: 'partnerships@civicgrid.io',
+  phone: '+91 80 4123 7890',
+  description: 'CivicGrid Technologies is an industry leader in civic technology, scalable IoT platforms, and data infrastructure partnering with academic institutions and civic bodies to solve urban and rural community challenges.',
+  expertise: [
+    'Civic technology',
+    'Cloud platforms',
+    'IoT & Edge Computing',
+    'Data engineering',
+    'GIS & Spatial Analytics',
+    'Embedded Firmware',
+  ],
+  resources: [
+    'Technical Expertise',
+    'Cloud Architecture Mentorship',
+    'IoT Sensor Bundles',
+    'CSR Seed Funding',
+    'Field Deployment Support',
+    'Data Science Workshops',
+  ],
+  industries: [
+    'Smart Governance',
+    'Public Utilities',
+    'Environmental Monitoring',
+    'Digital Education',
+    'Rural Infrastructure',
+  ],
+  preferredCategories: [
+    'Water and Sanitation',
+    'Education',
+    'Healthcare',
+    'Renewable Energy',
+    'Waste Management',
+  ],
+  collaborationTypes: [
+    'Technical Expertise',
+    'Equipment & Hardware',
+    'Mentorship Sessions',
+    'CSR Grant Funding',
+    'Field Deployment',
+  ],
+  verified: true,
+}

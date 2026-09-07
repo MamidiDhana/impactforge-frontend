@@ -1,0 +1,7 @@
+import { CalendarDays, MapPin, Users } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import type { Problem } from '../../types'
+import { ProblemCategoryBadge } from './ProblemCategoryBadge'
+import { ProblemStatusBadge } from './ProblemStatusBadge'
+interface ProblemCardProps { problem: Problem; detailsHref?: string }
+export function ProblemCard({ problem, detailsHref = '#' }: ProblemCardProps) { return <article className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex flex-wrap items-center justify-between gap-2"><ProblemCategoryBadge category={problem.category} /><ProblemStatusBadge status={problem.status} /></div><h3 className="mt-4 font-[Manrope] text-lg font-bold text-[#13243b]">{problem.title}</h3><p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">{problem.description}</p><div className="mt-4 space-y-2 text-xs text-slate-500"><span className="flex items-center gap-2"><MapPin size={14} className="text-[#187e8d]" />{problem.location}</span><span className="flex items-center gap-2"><CalendarDays size={14} className="text-[#187e8d]" />Submitted {problem.submittedAt}</span>{problem.similarCount !== undefined && <span className="flex items-center gap-2"><Users size={14} className="text-[#187e8d]" />{problem.similarCount} similar problems</span>}</div><Link to={detailsHref} className="mt-5 inline-flex items-center justify-center rounded-lg bg-[#12365a] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#0e2b48]">View details</Link></article> }

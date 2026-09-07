@@ -1,0 +1,3 @@
+import { ArrowRight } from 'lucide-react'
+interface SectionHeaderProps { title: string; description?: string; actionText?: string; onAction?: () => void }
+export function SectionHeader({ title, description, actionText, onAction }: SectionHeaderProps) { return <div className="mb-5 flex items-end justify-between gap-4"><div><h2 className="font-[Manrope] text-lg font-bold text-[#13243b]">{title}</h2>{description && <p className="mt-1 text-sm text-slate-500">{description}</p>}</div>{actionText && <button type="button" onClick={onAction} className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[#187e8d] hover:text-[#12365a]">{actionText}<ArrowRight size={15} /></button>}</div> }

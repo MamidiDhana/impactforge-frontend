@@ -1,0 +1,10 @@
+import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
+import { AppLogo } from '../components/common/AppLogo'
+import { PublicNavbar } from '../components/navigation/PublicNavbar'
+
+type PublicLayoutProps = { children: ReactNode }
+
+export function PublicLayout({ children }: PublicLayoutProps) {
+  return <div className="min-h-screen bg-[#f7f9fc] text-[#13243b]"><PublicNavbar /><main>{children}</main><footer className="border-t border-slate-200 bg-white"><div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-8"><div><AppLogo /><p className="mt-4 max-w-xs text-sm leading-6 text-slate-500">Connecting validated community challenges with the people and capabilities that can turn them into measurable impact.</p></div><div><h2 className="text-sm font-bold text-[#13243b]">Explore</h2><div className="mt-4 grid gap-3 text-sm text-slate-500"><Link to="/about" className="hover:text-[#187e8d]">About</Link><Link to="/how-it-works" className="hover:text-[#187e8d]">How it works</Link><Link to="/problems" className="hover:text-[#187e8d]">Explore problems</Link></div></div><div><h2 className="text-sm font-bold text-[#13243b]">Join the ecosystem</h2><div className="mt-4 grid gap-3 text-sm text-slate-500"><Link to="/universities" className="hover:text-[#187e8d]">Universities</Link><Link to="/partners" className="hover:text-[#187e8d]">Partners</Link><Link to="/register" className="hover:text-[#187e8d]">Join the platform</Link></div></div><div><h2 className="text-sm font-bold text-[#13243b]">Contact</h2><p className="mt-4 text-sm leading-6 text-slate-500">hello@impactforge.example<br />Privacy Policy<br />Terms of use</p></div></div><div className="border-t border-slate-200"><div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><span>© 2026 ImpactForge. Illustrative platform preview.</span><span>Building better outcomes, together.</span></div></div></footer></div>
+}

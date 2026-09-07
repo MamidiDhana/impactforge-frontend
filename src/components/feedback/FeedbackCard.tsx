@@ -1,0 +1,4 @@
+import { MessageSquareQuote } from 'lucide-react'
+import { RatingStars } from './RatingStars'
+interface FeedbackCardProps { userName: string; rating: number; text: string; date: string; response?: string }
+export function FeedbackCard({ userName, rating, text, date, response }: FeedbackCardProps) { return <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between gap-4"><div><h3 className="font-semibold text-[#13243b]">{userName}</h3><p className="mt-1 text-xs text-slate-400">{date}</p></div><RatingStars value={rating} /></div><p className="mt-4 text-sm leading-6 text-slate-600">{text}</p>{response && <div className="mt-4 flex gap-3 rounded-lg bg-slate-50 p-3"><MessageSquareQuote size={17} className="mt-0.5 shrink-0 text-[#187e8d]" /><div><p className="text-xs font-bold text-slate-700">Response</p><p className="mt-1 text-sm leading-5 text-slate-500">{response}</p></div></div>}</article> }

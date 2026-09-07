@@ -1,0 +1,7 @@
+import { Building2 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import type { Project } from '../../types'
+import { ProjectStatusBadge } from './ProjectStatusBadge'
+import { ProjectProgress } from './ProjectProgress'
+interface ProjectCardProps { project: Project; detailsHref?: string }
+export function ProjectCard({ project, detailsHref = '#' }: ProjectCardProps) { return <article className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between gap-3"><h3 className="font-[Manrope] text-lg font-bold text-[#13243b]">{project.title}</h3><ProjectStatusBadge status={project.status} /></div><p className="mt-2 text-sm text-slate-500">Solving: {project.problemTitle}</p><p className="mt-3 flex items-center gap-2 text-xs font-medium text-slate-500"><Building2 size={14} className="text-[#187e8d]" />{project.organization}</p><div className="mt-5"><ProjectProgress percentage={project.progress} currentStage={project.currentMilestone} /></div><Link to={detailsHref} className="mt-5 inline-flex items-center justify-center rounded-lg border border-[#12365a] px-4 py-2.5 text-sm font-semibold text-[#12365a] hover:bg-[#f1f6fa]">View project</Link></article> }

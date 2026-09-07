@@ -1,0 +1,2 @@
+interface ProblemCategoryBadgeProps { category: string }
+export function ProblemCategoryBadge({ category }: ProblemCategoryBadgeProps) { return <span className="inline-flex rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-600">{category}</span> }

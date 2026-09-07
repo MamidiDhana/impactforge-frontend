@@ -1,0 +1,11 @@
+import { useState } from 'react'
+import { CheckCircle2 } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Link, useNavigate } from 'react-router-dom'
+import { AuthLayout } from '../../layouts/AuthLayout'
+import { FormField } from '../../components/forms/FormField'
+const schema = z.object({ password: z.string().min(8, 'Password must contain at least 8 characters'), confirmPassword: z.string().min(1, 'Confirm your password') }).superRefine((values, context) => { if (values.password !== values.confirmPassword) context.addIssue({ code: 'custom', path: ['confirmPassword'], message: 'Passwords do not match' }) })
+type Values = z.infer<typeof schema>
+export function ResetPasswordPage() { const navigate = useNavigate(); const [complete, setComplete] = useState(false); const { register, handleSubmit, formState: { errors } } = useForm<Values>({ resolver: zodResolver(schema) }); const submit = () => { setComplete(true); setTimeout(() => navigate('/login'), 1000) }; return <AuthLayout title="Return to the work that matters."><h2 className="font-[Manrope] text-2xl font-bold text-[#13243b]">Set a new password</h2>{complete ? <div role="status" className="mt-7 rounded-xl bg-emerald-50 p-4 text-sm leading-6 text-emerald-800"><CheckCircle2 className="mb-2 text-emerald-600" size={22} />Password reset complete. Returning to login...</div> : <form onSubmit={handleSubmit(submit)} className="mt-7 space-y-4" noValidate><FormField label="New password" type="password" autoComplete="new-password" {...register('password')} error={errors.password?.message} required /><FormField label="Confirm password" type="password" autoComplete="new-password" {...register('confirmPassword')} error={errors.confirmPassword?.message} required /><button type="submit" className="w-full rounded-lg bg-[#12365a] px-4 py-3 text-sm font-bold text-white hover:bg-[#0e2b48]">Reset password</button></form>}<Link to="/login" className="mt-6 block text-center text-sm font-semibold text-[#187e8d]">Back to login</Link></AuthLayout> }

@@ -1,0 +1,6 @@
+import type { GovernmentProject } from '../types'
+export const governmentProjects: GovernmentProject[] = [
+  { id: 'gov-project-water', title: 'Solar water monitoring pilot', problemTitle: 'Reliable drinking water for Kolar villages', organization: 'National Institute of Technology Karnataka', facultyLead: 'Dr. Meera Nair', category: 'Water and Sanitation', stage: 'Prototype', currentMilestone: 'Prototype design', progress: 48, beneficiaries: 1800, lastUpdated: '22 Aug 2026', status: 'Active' },
+  { id: 'gov-project-waste', title: 'Neighbourhood segregation feedback pilot', problemTitle: 'Neighbourhood waste segregation participation', organization: 'Symbiosis Institute of Design', facultyLead: 'Prof. Kavya Shah', category: 'Environment', stage: 'Pilot', currentMilestone: 'Pilot rollout', progress: 76, beneficiaries: 24000, lastUpdated: '20 Aug 2026', status: 'Active' },
+  { id: 'gov-project-crossing', title: 'Safe school crossing redesign', problemTitle: 'Safer crossings around public schools', organization: 'Indian Institute of Technology Bhubaneswar', facultyLead: 'Dr. Rohan Das', category: 'Public Safety', stage: 'Completed', currentMilestone: 'Impact review', progress: 100, beneficiaries: 3200, lastUpdated: '12 Aug 2026', status: 'Completed' },
+]

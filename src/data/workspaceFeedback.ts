@@ -1,0 +1,2 @@
+import type { ProjectFeedback } from '../types'
+export const workspaceFeedback: ProjectFeedback[] = [{ id: 'pf1', source: 'Government officer', rating: 4, comments: 'The prototype direction is clear and grounded in the validated need.', submittedDate: '23 Aug 2026', category: 'Project review' }, { id: 'pf2', source: 'Community representative', rating: 5, comments: 'The team listened carefully to local context.', submittedDate: '20 Aug 2026', category: 'Community feedback' }]

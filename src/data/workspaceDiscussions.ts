@@ -1,0 +1,2 @@
+import type { ProjectDiscussion } from '../types'
+export const workspaceDiscussions: ProjectDiscussion[] = [{ id: 'pdsc1', title: 'Field deployment assumptions', author: 'Dr. Meera Nair', timestamp: 'Today, 10:30', pinned: true, comments: [{ id: 'c1', author: 'Riya Shah', text: 'I added the latest sensor readings for review.', timestamp: 'Today, 11:05' }] }, { id: 'pdsc2', title: 'Partner technical review', author: 'Karan Patel', timestamp: 'Yesterday', pinned: false, comments: [] }]

@@ -1,0 +1,2 @@
+interface LoadingStateProps { label?: string; rows?: number }
+export function LoadingState({ label = 'Loading', rows = 3 }: LoadingStateProps) { return <div role="status" aria-label={label} className="space-y-3">{Array.from({ length: rows }, (_, index) => <div key={index} className="h-16 animate-pulse rounded-xl bg-slate-200/70" />)}<span className="sr-only">{label}</span></div> }

@@ -1,0 +1,3 @@
+import type { ReactNode } from 'react'
+interface DashboardWelcomeProps { name: string; description?: string; action?: ReactNode }
+export function DashboardWelcome({ name, description = 'Here is what is happening across your impact work.', action }: DashboardWelcomeProps) { return <section className="flex flex-col gap-4 rounded-xl bg-[#12365a] p-6 text-white shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-8"><div><p className="text-sm font-medium text-teal-200">Welcome back</p><h2 className="mt-1 font-[Manrope] text-2xl font-bold">{name}</h2><p className="mt-2 max-w-xl text-sm leading-6 text-blue-100">{description}</p></div>{action && <div className="shrink-0">{action}</div>}</section> }

@@ -1,0 +1,4 @@
+import { Check, Circle, Clock3 } from 'lucide-react'
+import type { Milestone } from '../../types'
+interface MilestoneListProps { milestones: Milestone[] }
+export function MilestoneList({ milestones }: MilestoneListProps) { return <ol className="space-y-4">{milestones.map((milestone) => <li key={milestone.id} className="flex gap-3"><span className={`mt-0.5 grid size-6 shrink-0 place-items-center rounded-full ${milestone.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : milestone.status === 'current' ? 'bg-[#d9eeee] text-[#187e8d]' : 'bg-slate-100 text-slate-400'}`}>{milestone.status === 'completed' ? <Check size={14} /> : milestone.status === 'current' ? <Clock3 size={14} /> : <Circle size={10} />}</span><div><p className={`text-sm font-semibold ${milestone.status === 'upcoming' ? 'text-slate-500' : 'text-slate-700'}`}>{milestone.title}</p>{milestone.dueDate && <p className="mt-1 text-xs text-slate-400">{milestone.dueDate}</p>}</div></li>)}</ol> }

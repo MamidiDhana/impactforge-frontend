@@ -1,0 +1,3 @@
+import { Bell } from 'lucide-react'
+interface NotificationBellProps { count?: number; onClick?: () => void }
+export function NotificationBell({ count = 0, onClick }: NotificationBellProps) { return <button type="button" onClick={onClick} aria-label={count ? `${count} unread notifications` : 'Notifications'} className="relative rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-[#12365a]"><Bell size={19} />{count > 0 && <span className="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-bold leading-4 text-white">{count > 9 ? '9+' : count}</span>}</button> }

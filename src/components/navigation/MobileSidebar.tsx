@@ -1,0 +1,4 @@
+import { X } from 'lucide-react'
+import type { ReactNode } from 'react'
+interface MobileSidebarProps { open: boolean; onClose: () => void; children: ReactNode }
+export function MobileSidebar({ open, onClose, children }: MobileSidebarProps) { if (!open) return null; return <div className="fixed inset-0 z-40 lg:hidden"><button type="button" aria-label="Close navigation" onClick={onClose} className="absolute inset-0 bg-[#13243b]/40" /><aside className="relative z-10 flex h-full w-72 max-w-[85vw] flex-col bg-white p-4 shadow-xl"><button type="button" aria-label="Close navigation" onClick={onClose} className="absolute right-3 top-3 rounded-lg p-2 text-slate-400 hover:bg-slate-100"><X size={18} /></button><div className="mt-10">{children}</div></aside></div> }

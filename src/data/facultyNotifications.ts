@@ -1,0 +1,2 @@
+import type { Notification } from '../types'
+export const facultyNotifications: Notification[] = [{ id: 'fn1', title: 'Student output submitted', description: 'Sensor validation report is ready for review.', type: 'request', read: false, createdAt: 'Today' }, { id: 'fn2', title: 'Capability gap identified', description: 'The Blue Wells Team needs community deployment support.', type: 'status', read: false, createdAt: 'Yesterday' }]

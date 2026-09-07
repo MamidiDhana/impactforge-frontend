@@ -1,0 +1,2 @@
+import type { ProjectPartner } from '../types'
+export const workspacePartners: ProjectPartner[] = [{ id: 'ppw1', organization: 'CivicGrid Technologies', type: 'Industry Partner', contact: 'Karan Patel', contributionType: 'Technical Expertise', status: 'Active', resources: ['Cloud mentoring', 'Architecture review'], startDate: '22 Aug 2026' }]
