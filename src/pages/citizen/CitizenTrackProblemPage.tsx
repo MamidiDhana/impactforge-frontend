@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   Search,
@@ -17,6 +17,8 @@ import {
   Sparkles,
   Send,
   Boxes,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react'
 import { CitizenLayout } from '../../layouts/CitizenLayout'
 import { PageContainer } from '../../components/common/PageContainer'
@@ -24,14 +26,23 @@ import { PageHeader } from '../../components/common/PageHeader'
 import { CitizenStatusBadge } from '../../components/citizen/CitizenStatusBadge'
 import { JharkhandMapPreview } from '../../components/citizen/JharkhandMapPreview'
 import { useProblems } from '../../context/ProblemContext'
-import type { CitizenFeedback, TrackingStage } from '../../types'
+import { getReportByTrackId, getReports, mapBackendReportToCitizenProblem } from '../../services/reportService'
+import type { CitizenFeedback, CitizenProblem, TrackingStage } from '../../types'
 
 export function CitizenTrackProblemPage() {
   const { trackId: paramTrackId } = useParams()
   const navigate = useNavigate()
-  const { citizenProblems, getProblemByTrackId, submitCitizenFeedback } = useProblems()
+  const { submitCitizenFeedback, addBackendProblem } = useProblems()
 
-  // Track ID search / selection
+  // Active problem loaded from backend
+  const [activeProblem, setActiveProblem] = useState<CitizenProblem | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
+  const [refreshSuccess, setRefreshSuccess] = useState<boolean>(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [backendReportsList, setBackendReportsList] = useState<{ trackId: string; title: string }[]>([])
+
+  // Track ID search input
   const [searchInput, setSearchInput] = useState(paramTrackId || '')
 
   // Feedback form state
@@ -40,18 +51,69 @@ export function CitizenTrackProblemPage() {
   const [problemSolved, setProblemSolved] = useState<'yes' | 'partially' | 'no'>('yes')
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
 
-  // Find active problem: either by URL param, search input, or default to first citizen problem
-  const activeProblem = useMemo(() => {
-    if (paramTrackId) {
-      const match = getProblemByTrackId(paramTrackId)
-      if (match) return match
+  // Fetch report by track_id from backend (GET /api/reports/{track_id})
+  const loadReport = async (trackIdToLoad?: string, isStatusRefresh = false) => {
+    if (isStatusRefresh) {
+      setIsRefreshing(true)
+    } else {
+      setIsLoading(true)
     }
-    if (searchInput.trim()) {
-      const match = getProblemByTrackId(searchInput.trim())
-      if (match) return match
+    setFetchError(null)
+
+    try {
+      // Fetch available backend reports list for selector
+      try {
+        const all = await getReports()
+        setBackendReportsList(
+          all.map((r) => ({
+            trackId: r.track_id,
+            title: r.problem_title,
+          }))
+        )
+
+        if (!trackIdToLoad && all.length > 0) {
+          trackIdToLoad = all[0].track_id
+        }
+      } catch (listErr) {
+        console.warn('Failed to load backend reports list:', listErr)
+      }
+
+      if (trackIdToLoad && trackIdToLoad.trim()) {
+        const cleanId = trackIdToLoad.trim().toUpperCase()
+        setSearchInput(cleanId)
+        const backendReport = await getReportByTrackId(cleanId)
+        const mappedProblem = mapBackendReportToCitizenProblem(backendReport)
+        setActiveProblem(mappedProblem)
+        addBackendProblem(mappedProblem)
+
+        if (isStatusRefresh) {
+          setRefreshSuccess(true)
+          setTimeout(() => setRefreshSuccess(false), 2500)
+        }
+      } else {
+        setActiveProblem(null)
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Report not found or server error.'
+      setFetchError(msg)
+      setActiveProblem(null)
+    } finally {
+      setIsLoading(false)
+      setIsRefreshing(false)
     }
-    return citizenProblems[0]
-  }, [paramTrackId, searchInput, getProblemByTrackId, citizenProblems])
+  }
+
+  // Load report when paramTrackId changes
+  useEffect(() => {
+    loadReport(paramTrackId)
+  }, [paramTrackId])
+
+  const handleRefreshStatus = () => {
+    const idToRefresh = activeProblem?.trackId || paramTrackId || searchInput
+    if (idToRefresh) {
+      loadReport(idToRefresh, true)
+    }
+  }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -105,6 +167,7 @@ export function CitizenTrackProblemPage() {
     activeProblem &&
     ((activeProblem.currentStageIndex ?? 0) >= 13 ||
       activeProblem.status === 'Converted to Project' ||
+      activeProblem.status === 'Resolved' ||
       activeProblem.timelineStages?.[13]?.status === 'Completed')
 
   return (
@@ -119,7 +182,7 @@ export function CitizenTrackProblemPage() {
           ]}
         />
 
-        {/* Track ID Search and Quick Selector Bar */}
+        {/* Track ID Search and Real Backend Report Selector */}
         <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             {/* Search Input Form */}
@@ -142,10 +205,10 @@ export function CitizenTrackProblemPage() {
               </button>
             </form>
 
-            {/* Quick selector of current citizen's own reported problems */}
-            {citizenProblems.length > 0 && (
+            {/* Quick selector of live reports from backend */}
+            {backendReportsList.length > 0 && (
               <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span className="font-semibold text-slate-700 whitespace-nowrap">My Reports:</span>
+                <span className="font-semibold text-slate-700 whitespace-nowrap">Live Reports:</span>
                 <select
                   value={activeProblem?.trackId || ''}
                   onChange={(e) => {
@@ -154,8 +217,8 @@ export function CitizenTrackProblemPage() {
                   }}
                   className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
                 >
-                  {citizenProblems.map((p) => (
-                    <option key={p.id} value={p.trackId}>
+                  {backendReportsList.map((p) => (
+                    <option key={p.trackId} value={p.trackId}>
                       {p.trackId} - {p.title.slice(0, 32)}...
                     </option>
                   ))}
@@ -165,19 +228,28 @@ export function CitizenTrackProblemPage() {
           </div>
         </div>
 
-        {!activeProblem ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
+        {/* Loading Skeleton */}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-16 text-center shadow-sm">
+            <Loader2 size={36} className="animate-spin text-[#187e8d]" />
+            <h3 className="mt-4 font-[Manrope] text-base font-bold text-[#13243b]">
+              Loading Problem Report...
+            </h3>
+            <p className="mt-1 text-xs text-slate-500">Fetching live status from ImpactForge backend</p>
+          </div>
+        ) : !activeProblem ? (
+          <div className="rounded-xl border border-slate-200 bg-white p-12 text-center shadow-sm">
             <AlertCircle size={36} className="mx-auto text-amber-500" />
             <h2 className="mt-3 font-[Manrope] text-lg font-bold text-[#13243b]">
-              No Problem Found for Track ID "{searchInput}"
+              {fetchError || `No Problem Found for Track ID "${searchInput || paramTrackId || ''}"`}
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              Please verify the Track ID format (e.g. IF-JH-2026-0001) or pick from your reported problems.
+              Please verify the Track ID format (e.g. IF-JH-2026-0001) or report a new community problem.
             </p>
             <div className="mt-5">
               <Link
                 to="/citizen/submit-problem"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#12365a] px-4 py-2 text-sm font-bold text-white"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#12365a] px-4 py-2 text-sm font-bold text-white shadow hover:bg-[#1a4a7a]"
               >
                 Report a Problem
               </Link>
@@ -207,7 +279,28 @@ export function CitizenTrackProblemPage() {
                     <p className="mt-2 text-sm text-slate-600 line-clamp-2">{activeProblem.description}</p>
                   </div>
 
-                  <div className="flex shrink-0 gap-2">
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    {/* Status Refresh Action */}
+                    <button
+                      type="button"
+                      onClick={handleRefreshStatus}
+                      disabled={isRefreshing}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition hover:border-[#187e8d] hover:bg-slate-50 disabled:opacity-60 active:scale-95"
+                      title="Refresh current report status from backend"
+                    >
+                      <RefreshCw
+                        size={14}
+                        className={isRefreshing ? 'animate-spin text-[#187e8d]' : refreshSuccess ? 'text-emerald-600' : 'text-slate-600'}
+                      />
+                      <span>
+                        {isRefreshing
+                          ? 'Refreshing...'
+                          : refreshSuccess
+                          ? 'Status Up to Date!'
+                          : 'Refresh Status'}
+                      </span>
+                    </button>
+
                     <Link
                       to={`/citizen/problems/${activeProblem.id}`}
                       className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition hover:border-[#187e8d] hover:bg-slate-50"

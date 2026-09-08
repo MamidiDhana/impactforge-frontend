@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { UploadCloud } from 'lucide-react'
+import { UploadCloud, AlertCircle, Loader2 } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -15,6 +15,7 @@ import { TrackIdConfirmationModal } from '../../components/citizen/TrackIdConfir
 import { useAuth } from '../../context/AuthContext'
 import { useProblems } from '../../context/ProblemContext'
 import { JHARKHAND_DISTRICTS, REPORT_PROBLEM_TRANSLATIONS } from '../../data/jharkhandData'
+import { createReport, mapBackendReportToCitizenProblem, type BackendReportPayload } from '../../services/reportService'
 import type { CitizenProblem } from '../../types'
 
 const CATEGORY_KEYS = [
@@ -61,12 +62,13 @@ type Values = z.infer<typeof schema>
 export function SubmitProblemPage() {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
-  const { reportProblem, language } = useProblems()
+  const { addBackendProblem, language } = useProblems()
 
   const t = REPORT_PROBLEM_TRANSLATIONS[language] || REPORT_PROBLEM_TRANSLATIONS.en
 
   const [files, setFiles] = useState<string[]>([])
   const [createdProblem, setCreatedProblem] = useState<CitizenProblem | null>(null)
+  const [apiError, setApiError] = useState<string | null>(null)
 
   const {
     control,
@@ -94,36 +96,42 @@ export function SubmitProblemPage() {
   const selectedLocality = useWatch({ control, name: 'locality', defaultValue: '' }) || ''
   const selectedLandmark = useWatch({ control, name: 'landmark', defaultValue: '' }) || ''
 
-  const [coords, setCoords] = useState<{ lat: number; lng: number }>({
-    lat: 23.3441,
-    lng: 85.3096,
-  })
+  // Null when user has not explicitly clicked on the map location
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
 
-  const handleDistrictSelect = (districtName: string, lat: number, lng: number) => {
+  const handleDistrictSelect = (districtName: string) => {
     setValue('district', districtName, { shouldValidate: true })
-    setCoords({ lat, lng })
   }
 
   const submit = async (values: Values) => {
-    const formattedLocation = `${values.district}, Jharkhand${values.locality ? ` (${values.locality})` : ''}`
+    setApiError(null)
 
-    const newProblem = await reportProblem({
-      title: values.title,
-      description: values.description,
+    // Build payload with exact backend field names
+    const payload: BackendReportPayload = {
+      problem_title: values.title.trim(),
       category: values.category,
-      location: formattedLocation,
+      context_and_desired_outcome: values.description.trim() || null,
+      existing_efforts: values.existingEfforts?.trim() || null,
+      expected_outcome: values.expectedOutcome?.trim() || null,
       state: 'Jharkhand',
       district: values.district,
-      locality: values.locality || '',
-      landmark: values.landmark || '',
-      latitude: coords.lat,
-      longitude: coords.lng,
-      affectedPeople: values.affectedPeople,
-      urgency: values.urgency,
-      requiredCapabilities: ['Civic assessment', 'Field survey', 'Public consultation'],
-    })
+      locality: values.locality?.trim() || values.district,
+      address_or_landmark: values.landmark?.trim() || values.locality?.trim() || `${values.district}, Jharkhand`,
+      latitude: coords ? coords.lat : null,
+      longitude: coords ? coords.lng : null,
+      priority: values.urgency,
+    }
 
-    setCreatedProblem(newProblem)
+    try {
+      // Call POST /api/reports - backend generates track_id
+      const backendReport = await createReport(payload)
+      const mappedProblem = mapBackendReportToCitizenProblem(backendReport)
+      addBackendProblem(mappedProblem)
+      setCreatedProblem(mappedProblem)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'An unexpected error occurred while submitting.'
+      setApiError(message)
+    }
   }
 
   return (
@@ -223,8 +231,8 @@ export function SubmitProblemPage() {
               selectedDistrict={selectedDistrict}
               selectedLocality={selectedLocality}
               selectedLandmark={selectedLandmark}
-              latitude={coords.lat}
-              longitude={coords.lng}
+              latitude={coords?.lat}
+              longitude={coords?.lng}
               onDistrictChange={handleDistrictSelect}
               onLocalityChange={(val) => setValue('locality', val)}
               onLandmarkChange={(val) => setValue('landmark', val)}
@@ -317,6 +325,20 @@ export function SubmitProblemPage() {
             <p className="text-xs text-red-600 font-medium">{t.consentError}</p>
           )}
 
+          {/* Backend API Error Banner */}
+          {apiError && (
+            <div
+              role="alert"
+              className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50/90 p-4 text-xs font-semibold text-red-800 shadow-sm animate-in fade-in"
+            >
+              <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-600" />
+              <div className="flex-1 space-y-1">
+                <p className="font-bold text-red-900">Unable to Submit Report</p>
+                <p className="font-normal text-red-700 leading-relaxed whitespace-pre-wrap">{apiError}</p>
+              </div>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
             <button
@@ -336,9 +358,16 @@ export function SubmitProblemPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-[#12365a] px-6 py-2.5 text-sm font-bold text-white shadow transition hover:bg-[#1a4a7a] disabled:opacity-60 active:scale-95"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#12365a] px-6 py-2.5 text-sm font-bold text-white shadow transition hover:bg-[#1a4a7a] disabled:opacity-60 active:scale-95"
             >
-              {isSubmitting ? t.submittingButton : t.submitButton}
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  <span>{t.submittingButton}</span>
+                </>
+              ) : (
+                <span>{t.submitButton}</span>
+              )}
             </button>
           </div>
           <p className="text-right text-xs text-slate-400">

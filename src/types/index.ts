@@ -1,9 +1,9 @@
 import type { LucideIcon } from 'lucide-react'
 
 export type UserRole = 'citizen' | 'government' | 'hei' | 'faculty' | 'partner' | 'admin'
-export type ProblemStatus = 'Pending' | 'Under Review' | 'Validated' | 'Rejected' | 'In Progress' | 'Completed' | 'Cancelled'
+export type ProblemStatus = 'Pending' | 'Under Review' | 'Validated' | 'Rejected' | 'In Progress' | 'Completed' | 'Cancelled' | 'Open' | 'Resolved'
 export type ProjectStatus = 'Draft' | 'Active' | 'Completed' | 'Cancelled'
-export type CitizenProblemStatus = 'Draft' | 'Submitted' | 'Under Review' | 'More Information Required' | 'Validated' | 'Rejected' | 'Redirected' | 'Converted to Project'
+export type CitizenProblemStatus = 'Draft' | 'Submitted' | 'Under Review' | 'More Information Required' | 'Validated' | 'Rejected' | 'Redirected' | 'Converted to Project' | 'Open' | 'In Progress' | 'Resolved'
 export type ValidationStatus = 'Submitted' | 'Under Review' | 'More Information Required' | 'Validated' | 'Rejected' | 'Redirected' | 'Converted to Project'
 
 export interface User {

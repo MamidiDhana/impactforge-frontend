@@ -41,6 +41,7 @@ interface ProblemContextValue {
     comment?: string
   ) => void
   submitCitizenFeedback: (trackId: string, feedback: CitizenFeedback) => void
+  addBackendProblem: (problem: CitizenProblem) => void
 }
 
 const ProblemContext = createContext<ProblemContextValue | undefined>(undefined)
@@ -251,6 +252,18 @@ export function ProblemProvider({ children }: { children: ReactNode }) {
     )
   }
 
+  const addBackendProblem = (problem: CitizenProblem) => {
+    setProblems((prev) => {
+      const existingIndex = prev.findIndex((p) => p.trackId === problem.trackId || p.id === problem.id)
+      if (existingIndex >= 0) {
+        const next = [...prev]
+        next[existingIndex] = { ...next[existingIndex], ...problem }
+        return next
+      }
+      return [problem, ...prev]
+    })
+  }
+
   return (
     <ProblemContext.Provider
       value={{
@@ -264,6 +277,7 @@ export function ProblemProvider({ children }: { children: ReactNode }) {
         reportProblem,
         updateProblemStatus,
         submitCitizenFeedback,
+        addBackendProblem,
       }}
     >
       {children}
