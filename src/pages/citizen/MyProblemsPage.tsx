@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Search, Compass, ExternalLink, MapPin } from 'lucide-react'
+import { Search, ExternalLink, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { CitizenLayout } from '../../layouts/CitizenLayout'
 import { PageContainer } from '../../components/common/PageContainer'
@@ -60,14 +60,14 @@ export function MyProblemsPage() {
   }
 
   return (
-    <CitizenLayout title="Reports">
+    <CitizenLayout title="Track Problem">
       <PageContainer>
         <PageHeader
-          title="Reports"
+          title="Track Problem"
           description="Review your reported problems in Jharkhand and track real-time resolution progress using your permanent Track ID."
           breadcrumbs={[
             { label: 'Citizen', href: '/citizen/dashboard' },
-            { label: 'Reports' },
+            { label: 'Track Problem' },
           ]}
           action={
             <Link
@@ -161,19 +161,11 @@ export function MyProblemsPage() {
 
                 <div className="mt-5 flex flex-wrap items-center justify-end gap-2.5 border-t border-slate-100 pt-3">
                   <Link
-                    to={`/citizen/track/${problem.trackId}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#187e8d] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#156976]"
-                  >
-                    <Compass size={14} />
-                    <span>Track Problem</span>
-                  </Link>
-
-                  <Link
                     to={`/citizen/problems/${problem.id}`}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#12365a] px-3.5 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#1a4a7a]"
                   >
                     <ExternalLink size={14} />
-                    <span>View Details</span>
+                    <span>Track Status & Details</span>
                   </Link>
                 </div>
               </article>

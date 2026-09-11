@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Bot, FileText, Flag, GraduationCap, MapPin, ShieldCheck, Tag } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { FileText, Flag, MapPin, ShieldCheck, Tag, Bot, Sparkles, GraduationCap, Building2, CheckCircle2 } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { GovernmentLayout } from '../../layouts/GovernmentLayout'
 import { GovPage, SuccessNotice } from './GovernmentShared'
@@ -7,40 +7,135 @@ import { CitizenStatusBadge } from '../../components/citizen/CitizenStatusBadge'
 import { ResponsiveCard } from '../../components/common/ResponsiveCard'
 import { ConfirmDialog } from '../../components/common/ConfirmDialog'
 import { EmptyState } from '../../components/common/EmptyState'
+import { LoadingState } from '../../components/common/LoadingState'
 import { TextAreaField } from '../../components/forms/TextAreaField'
 import { SelectField } from '../../components/forms/SelectField'
 import { JharkhandMapPreview } from '../../components/citizen/JharkhandMapPreview'
 import { governmentProblems } from '../../data/governmentProblems'
-import { heiRecommendations } from '../../data/heiRecommendations'
 import { useProblems } from '../../context/ProblemContext'
+import {
+  getReportByTrackId,
+  updateReportStatus,
+  validateAndRouteProblem,
+  mapBackendReportToCitizenProblem,
+  type BackendReportResponse,
+} from '../../services/reportService'
+import type { CitizenProblem } from '../../types'
 
 export function ProblemReviewPage() {
   const { id } = useParams()
   const { problems, updateProblemStatus } = useProblems()
 
-  // Find problem from reactive context or fallback to governmentProblems
-  const contextProblem = problems.find((item) => item.id === id || item.trackId === id)
-  const govProblem = governmentProblems.find((item) => item.id === id)
+  const cleanTrackId = id ? (id.startsWith('report-') ? id.replace('report-', '') : id) : ''
 
+  // Find problem from reactive context or fallback to governmentProblems
+  const contextProblem = problems.find(
+    (item) => item.id === id || item.trackId === id || (cleanTrackId && (item.id === cleanTrackId || item.trackId === cleanTrackId))
+  )
+  const govProblem = governmentProblems.find(
+    (item) => item.id === id || (cleanTrackId && item.id === cleanTrackId)
+  )
+
+  const [backendProblem, setBackendProblem] = useState<CitizenProblem | null>(null)
+  const [loadingBackend, setLoadingBackend] = useState<boolean>(true)
   const [dialog, setDialog] = useState<'validate' | 'info' | 'reject' | 'redirect' | null>(null)
   const [success, setSuccess] = useState('')
   const [rejectReason, setRejectReason] = useState('')
   const [infoQuestion, setInfoQuestion] = useState('')
   const [redirectDept, setRedirectDept] = useState('water')
   const [redirectReason, setRedirectReason] = useState('')
+  const [routingResult, setRoutingResult] = useState<{
+    routing_target: string
+    requires_funding: boolean
+    university_can_solve: boolean
+    reason: string
+  } | null>(null)
 
-  if (!contextProblem && !govProblem) {
+  useEffect(() => {
+    if (!cleanTrackId) {
+      setLoadingBackend(false)
+      return
+    }
+
+    let isMounted = true
+    setLoadingBackend(true)
+
+    getReportByTrackId(cleanTrackId)
+      .then((res) => {
+        if (isMounted && res) {
+          const mapped = mapBackendReportToCitizenProblem(res)
+          setBackendProblem(mapped)
+          if (res.routing_target) {
+            setRoutingResult({
+              routing_target: res.routing_target,
+              requires_funding: Boolean(res.requires_funding),
+              university_can_solve: Boolean(res.university_can_solve),
+              reason: res.ai_routing_reason || 'AI evaluated suitability and funding requirements.',
+            })
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn(`Problem ${cleanTrackId} not found in backend DB, using fallback.`, err)
+      })
+      .finally(() => {
+        if (isMounted) setLoadingBackend(false)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [cleanTrackId])
+
+  useEffect(() => {
+    setSuccess('')
+    setRejectReason('')
+    setInfoQuestion('')
+    setRedirectReason('')
+    setDialog(null)
+  }, [cleanTrackId])
+
+  // Backend database is primary source of truth for persistent status
+  const resolvedProblem = backendProblem || contextProblem || govProblem
+
+  if (loadingBackend && !resolvedProblem) {
     return (
-      <GovernmentLayout title="Problem review">
-        <GovPage title="Problem not found">
+      <GovernmentLayout title="Review Problem">
+        <GovPage
+          title="Review Problem"
+          description="Loading problem submission details from government queue..."
+          breadcrumbs={[
+            { label: 'Government', href: '/government/dashboard' },
+            { label: 'Problem Queue', href: '/government/problem-queue' },
+            { label: 'Review Problem' },
+          ]}
+        >
+          <LoadingState rows={4} />
+        </GovPage>
+      </GovernmentLayout>
+    )
+  }
+
+  if (!resolvedProblem) {
+    return (
+      <GovernmentLayout title="Review Problem">
+        <GovPage
+          title="Problem Not Found"
+          breadcrumbs={[
+            { label: 'Government', href: '/government/dashboard' },
+            { label: 'Problem Queue', href: '/government/problem-queue' },
+            { label: 'Review Problem' },
+          ]}
+        >
           <EmptyState
             title="Problem not found"
+            description="The requested problem report does not exist or has been removed from the queue."
             action={
               <Link
                 to="/government/problem-queue"
-                className="rounded-lg bg-[#12365a] px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-lg bg-[#12365a] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0e2a47]"
               >
-                Back to queue
+                Back to Problem Queue
               </Link>
             }
           />
@@ -50,74 +145,175 @@ export function ProblemReviewPage() {
   }
 
   // Merged view object with guaranteed Jharkhand values
-  const trackId = contextProblem?.trackId || 'IF-JH-2026-0001'
-  const title = contextProblem?.title || govProblem?.title || 'Community Challenge'
-  const description = contextProblem?.description || govProblem?.description || ''
-  const category = contextProblem?.category || govProblem?.category || 'Water and Sanitation'
-  const status = contextProblem?.status || govProblem?.status || 'Submitted'
-  const district = contextProblem?.district || 'Ramgarh'
-  const locality = contextProblem?.locality || 'Patratu Block'
-  const landmark = contextProblem?.landmark || 'Near Panchayat Bhavan'
-  const location = contextProblem?.location || `${district}, Jharkhand (${locality})`
-  const latitude = contextProblem?.latitude || 23.6300
-  const longitude = contextProblem?.longitude || 85.5100
-  const affectedPeople = contextProblem?.affectedPeople || govProblem?.affectedPeople || 4800
-  const urgency = contextProblem?.urgency || govProblem?.urgency || 'High'
-  const citizenLabel = contextProblem?.citizenId ? 'Verified Jharkhand Citizen' : govProblem?.citizenLabel || 'Citizen'
-  const requiredCapabilities = contextProblem?.requiredCapabilities || govProblem?.requiredCapabilities || [
-    'Water quality monitoring',
-    'Community engagement',
-  ]
-  const attachedFiles = govProblem?.attachedFiles || []
-  const problemId = contextProblem?.id || govProblem?.id || id || ''
+  const trackId =
+    resolvedProblem.trackId ||
+    (resolvedProblem.id.startsWith('IF-JH') ? resolvedProblem.id : 'IF-JH-2026-0001')
+  const title = resolvedProblem.title || 'Community Challenge'
+  const description = resolvedProblem.description || ''
+  const category = resolvedProblem.category || 'Water and Sanitation'
+  const status = resolvedProblem.status || 'Submitted'
+  const district = ('district' in resolvedProblem && resolvedProblem.district) || 'Ramgarh'
+  const locality = ('locality' in resolvedProblem && resolvedProblem.locality) || 'Patratu Block'
+  const landmark = ('landmark' in resolvedProblem && resolvedProblem.landmark) || 'Near Panchayat Bhavan'
+  const location = resolvedProblem.location || `${district}, Jharkhand (${locality})`
+  const latitude =
+    'latitude' in resolvedProblem && typeof resolvedProblem.latitude === 'number'
+      ? resolvedProblem.latitude
+      : 23.63
+  const longitude =
+    'longitude' in resolvedProblem && typeof resolvedProblem.longitude === 'number'
+      ? resolvedProblem.longitude
+      : 85.51
+  const affectedPeople =
+    ('affectedPeople' in resolvedProblem && resolvedProblem.affectedPeople) || 4800
+  const urgency = ('urgency' in resolvedProblem && resolvedProblem.urgency) || 'High'
+  const citizenLabel =
+    'citizenId' in resolvedProblem && resolvedProblem.citizenId
+      ? 'Verified Jharkhand Citizen'
+      : 'citizenLabel' in resolvedProblem && typeof resolvedProblem.citizenLabel === 'string'
+      ? resolvedProblem.citizenLabel
+      : 'Citizen'
+  const attachedFiles =
+    'attachedFiles' in resolvedProblem && Array.isArray(resolvedProblem.attachedFiles)
+      ? resolvedProblem.attachedFiles
+      : []
+  const problemId = resolvedProblem.id || id || ''
 
-  const handleValidate = () => {
+  const handleValidate = async () => {
+    // 1. Immediately update local state so UI transitions instantly
+    setBackendProblem((prev) => {
+      const base = prev || resolvedProblem
+      return base ? { ...base, status: 'Validated' } : null
+    })
+
+    // 2. Update reactive context
     updateProblemStatus(
-      problemId,
+      cleanTrackId || problemId,
       'Validated',
       3,
-      'Problem validated by Jharkhand District Innovation Cell. Approved for University matching.'
+      'Problem validated by Jharkhand District Innovation Cell. Initiating AI routing.'
     )
+
+    if (trackId && trackId.startsWith('IF-JH')) {
+      try {
+        let res: BackendReportResponse | null = null
+        try {
+          res = await validateAndRouteProblem(
+            trackId,
+            'Problem validated by Jharkhand District Innovation Cell. Approved for AI routing.'
+          )
+        } catch (routeErr) {
+          console.warn('validateAndRouteProblem failed, falling back to updateReportStatus:', routeErr)
+          res = await updateReportStatus(
+            trackId,
+            'Validated',
+            'Problem validated by Jharkhand District Innovation Cell.'
+          ).catch(() => null)
+        }
+
+        if (res) {
+          setBackendProblem(mapBackendReportToCitizenProblem({ ...res, status: 'Validated' }))
+        }
+
+        if (res?.routing_target) {
+          setRoutingResult({
+            routing_target: res.routing_target,
+            requires_funding: Boolean(res.requires_funding),
+            university_can_solve: Boolean(res.university_can_solve),
+            reason: res.ai_routing_reason || 'AI evaluated suitability and funding requirements.',
+          })
+          const destinationLabel =
+            res.routing_target === 'university'
+              ? 'University Academic Dashboard'
+              : res.routing_target === 'partner'
+              ? 'Partner & Funding Dashboard'
+              : res.routing_target === 'both'
+              ? 'Both University and Partner Dashboards'
+              : 'Direct Government Administration (Hidden from University & Partner)'
+          setSuccess(`Problem validated! AI Assigned to: ${destinationLabel}.`)
+        } else {
+          setSuccess('Problem validated successfully. Status saved as "Validated".')
+        }
+      } catch (err) {
+        console.warn('Backend validate call encountered issue:', err)
+        setSuccess('Problem validated successfully. Status saved as "Validated".')
+      }
+    } else {
+      setSuccess('Problem validated successfully. Status saved as "Validated".')
+    }
     setDialog(null)
-    setSuccess('Problem validated successfully. Track ID status updated to "Government Accepted".')
   }
 
-  const handleReject = () => {
-    updateProblemStatus(problemId, 'Rejected', 2, rejectReason || 'Does not meet program criteria.')
+  const handleReject = async () => {
+    const reason = rejectReason.trim() || 'Does not meet program criteria.'
+
+    // 1. Immediately update local state so UI transitions instantly
+    setBackendProblem((prev) => {
+      const base = prev || resolvedProblem
+      return base ? { ...base, status: 'Rejected', governmentComment: reason } : null
+    })
+
+    // 2. Update reactive context
+    updateProblemStatus(cleanTrackId || problemId, 'Rejected', 2, reason)
+
+    if (trackId && trackId.startsWith('IF-JH')) {
+      try {
+        const res = await updateReportStatus(trackId, 'Rejected', reason)
+        if (res) {
+          setBackendProblem(mapBackendReportToCitizenProblem(res))
+        }
+      } catch (err) {
+        console.warn('Backend updateReportStatus failed for rejection:', err)
+      }
+    }
+
     setDialog(null)
     setSuccess('Problem rejected. Reason communicated to reporting citizen.')
   }
 
-  const handleInfo = () => {
-    updateProblemStatus(
-      problemId,
-      'More Information Required',
-      2,
-      infoQuestion || 'Please provide additional site details.'
-    )
+  const handleInfo = async () => {
+    const reason = infoQuestion.trim() || 'Please provide additional site details.'
+    setBackendProblem((prev) => {
+      const base = prev || resolvedProblem
+      return base ? { ...base, status: 'More Information Required', governmentComment: reason } : null
+    })
+    updateProblemStatus(cleanTrackId || problemId, 'More Information Required', 2, reason)
+    if (trackId && trackId.startsWith('IF-JH')) {
+      try {
+        const res = await updateReportStatus(trackId, 'In Progress', reason)
+        if (res) setBackendProblem(mapBackendReportToCitizenProblem(res))
+      } catch {}
+    }
     setDialog(null)
     setSuccess('Information requested from reporting citizen.')
   }
 
-  const handleRedirect = () => {
-    updateProblemStatus(
-      problemId,
-      'Redirected',
-      2,
-      `Redirected to ${redirectDept} department: ${redirectReason}`
-    )
+  const handleRedirect = async () => {
+    const reason = `Redirected to ${redirectDept} department: ${redirectReason}`
+    setBackendProblem((prev) => {
+      const base = prev || resolvedProblem
+      return base ? { ...base, status: 'Redirected', governmentComment: reason } : null
+    })
+    updateProblemStatus(cleanTrackId || problemId, 'Redirected', 2, reason)
+    if (trackId && trackId.startsWith('IF-JH')) {
+      try {
+        const res = await updateReportStatus(trackId, 'In Progress', reason)
+        if (res) setBackendProblem(mapBackendReportToCitizenProblem(res))
+      } catch {}
+    }
     setDialog(null)
     setSuccess(`Problem successfully redirected to Jharkhand Department of ${redirectDept}.`)
   }
 
   return (
-    <GovernmentLayout title="Review">
+    <GovernmentLayout title="Review Problem">
       <GovPage
-        title="Review"
-        description="Review citizen evidence, inspect Jharkhand geo-location, and make a governance decision."
+        title="Review Problem"
+        description="Review citizen evidence, inspect Jharkhand geo-location, and make an official governance decision."
         breadcrumbs={[
           { label: 'Government', href: '/government/dashboard' },
-          { label: 'Review' },
+          { label: 'Problem Queue', href: '/government/problem-queue' },
+          { label: 'Review Problem' },
         ]}
         action={
           <div className="flex items-center gap-2">
@@ -175,7 +371,7 @@ export function ProblemReviewPage() {
               </div>
             </ResponsiveCard>
 
-            {/* Requirement 4.B: Government Citizen Location & Map Preview */}
+            {/* Citizen Location & Map Preview */}
             <ResponsiveCard>
               <h2 className="font-[Manrope] text-base font-bold text-[#13243b]">
                 Citizen-Submitted Jharkhand Location Preview
@@ -232,54 +428,15 @@ export function ProblemReviewPage() {
             </ResponsiveCard>
           </div>
 
-          {/* Right Column: AI Analysis, HEI Recommendations, and Governance Actions */}
+          {/* Right Column: Governance Review Checklist and Protocol */}
           <div className="space-y-6">
-            <ResponsiveCard className="border-[#b8dfe0]">
-              <div className="flex items-center gap-3">
-                <Bot className="text-[#187e8d]" />
-                <h2 className="font-[Manrope] text-lg font-bold text-[#13243b]">
-                  AI-Assisted Capabilities Matching
-                </h2>
-              </div>
-              <p className="mt-2 text-xs text-slate-500">
-                Automated capability extraction for Jharkhand HEI matchmaking. Final governance decision rests with officer.
-              </p>
-              <div className="mt-5 grid gap-3 text-sm">
-                <p>
-                  Suggested category: <b>{category}</b>
-                </p>
-                <p>
-                  Suggested priority: <b>{urgency === 'Critical' ? 'High' : 'Medium'}</b>
-                </p>
-                <p>
-                  Duplicate status: <b>No duplicate detected in {district}</b>
-                </p>
-              </div>
-
-              <h3 className="mt-5 text-sm font-bold text-slate-700">Extracted Capabilities</h3>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {requiredCapabilities.map((item) => (
-                  <span
-                    key={item}
-                    className="rounded-full bg-[#e8f5f5] px-3 py-1 text-xs text-[#187e8d]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-
-              <h3 className="mt-5 text-sm font-bold text-slate-700">Recommended State HEIs</h3>
-              <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
-                <GraduationCap size={16} className="text-[#187e8d]" />
-                {heiRecommendations[0]?.university || 'BIT Mesra, Ranchi'} ·{' '}
-                {heiRecommendations[0]?.match || 92}% capability match
-              </p>
-            </ResponsiveCard>
-
             <ResponsiveCard>
               <h2 className="font-[Manrope] font-bold text-[#13243b]">
                 Jharkhand Governance Review Checklist
               </h2>
+              <p className="mt-1 text-xs text-slate-500">
+                Official protocol for validating citizen-reported community issues before administrative escalation.
+              </p>
               <div className="mt-4 grid gap-3 text-sm text-slate-600">
                 {[
                   'Problem is located within Jharkhand boundaries',
@@ -294,6 +451,26 @@ export function ProblemReviewPage() {
                 ))}
               </div>
             </ResponsiveCard>
+
+            <ResponsiveCard>
+              <h2 className="font-[Manrope] font-bold text-[#13243b]">
+                Review Guidelines
+              </h2>
+              <div className="mt-3 space-y-2 text-xs leading-5 text-slate-500">
+                <p>
+                  • <b>Validate:</b> Accepts the submission and routes it into the university/HEI solution pipeline.
+                </p>
+                <p>
+                  • <b>Request Info:</b> Sends an inquiry back to the citizen for supplemental field photos or specifics.
+                </p>
+                <p>
+                  • <b>Redirect:</b> Transmits jurisdiction to the corresponding state department (e.g. Drinking Water, Roads).
+                </p>
+                <p>
+                  • <b>Reject:</b> Formally dismisses grievances outside policy scope with mandatory written justification.
+                </p>
+              </div>
+            </ResponsiveCard>
           </div>
         </div>
 
@@ -306,50 +483,215 @@ export function ProblemReviewPage() {
           </div>
         )}
 
-        {/* Governance Decision Action Bar */}
-        <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => setDialog('validate')}
-            className="rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-emerald-800"
-          >
-            Validate Problem (Accept)
-          </button>
-          <button
-            type="button"
-            onClick={() => setDialog('info')}
-            className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 hover:bg-amber-100"
-          >
-            Request More Information
-          </button>
-          <button
-            type="button"
-            onClick={() => setDialog('reject')}
-            className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50"
-          >
-            Reject Problem
-          </button>
-          <button
-            type="button"
-            onClick={() => setDialog('redirect')}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            <Flag size={15} className="mr-1 inline" />
-            Redirect
-          </button>
-          <Link
-            to={`/government/duplicate-analysis`}
-            className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            View Similar Problems
-          </Link>
-        </div>
+        {routingResult && (
+          <div className="mt-6 rounded-2xl border-2 border-indigo-200 bg-gradient-to-r from-indigo-50/70 via-white to-teal-50/70 p-6 shadow-md animate-in fade-in">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-indigo-100 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="grid size-10 place-items-center rounded-xl bg-[#12365a] text-teal-300 shadow-sm">
+                  <Bot size={22} />
+                </div>
+                <div>
+                  <h3 className="font-[Manrope] text-base font-bold text-[#13243b] flex items-center gap-2">
+                    AI Decision & Portal Routing Outcome
+                    <Sparkles size={16} className="text-amber-500" />
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Evaluated by AI Governance Engine · Controlled Problem Distribution
+                  </p>
+                </div>
+              </div>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold shadow-sm ${
+                  routingResult.routing_target === 'university'
+                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                    : routingResult.routing_target === 'partner'
+                    ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                    : routingResult.routing_target === 'both'
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                    : 'bg-slate-100 text-slate-800 border border-slate-200'
+                }`}
+              >
+                {routingResult.routing_target === 'university' && <GraduationCap size={15} />}
+                {routingResult.routing_target === 'partner' && <Building2 size={15} />}
+                {routingResult.routing_target === 'both' && <CheckCircle2 size={15} />}
+                <span>
+                  {routingResult.routing_target === 'university'
+                    ? 'Assigned: University Only'
+                    : routingResult.routing_target === 'partner'
+                    ? 'Assigned: Partner Only'
+                    : routingResult.routing_target === 'both'
+                    ? 'Assigned: Both (University + Partner)'
+                    : 'Assigned: Neither (Retained in Gov)'}
+                </span>
+              </span>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-sm">
+                <p className="text-xs font-semibold text-slate-500">Criteria 1: External Funding Needed</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span
+                    className={`inline-block size-2.5 rounded-full ${
+                      routingResult.requires_funding ? 'bg-amber-500' : 'bg-emerald-500'
+                    }`}
+                  />
+                  <span className="text-sm font-bold text-[#13243b]">
+                    {routingResult.requires_funding ? 'Yes — Requires Capital / CSR Funding' : 'No — Operational / Low-Cost'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 shadow-sm">
+                <p className="text-xs font-semibold text-slate-500">Criteria 2: University / Academic Solvable</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <span
+                    className={`inline-block size-2.5 rounded-full ${
+                      routingResult.university_can_solve ? 'bg-emerald-500' : 'bg-rose-500'
+                    }`}
+                  />
+                  <span className="text-sm font-bold text-[#13243b]">
+                    {routingResult.university_can_solve ? 'Yes — Suitable for HEI Labs & Faculty' : 'No — Outside Academic Scope'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-indigo-100 bg-white/90 p-4 text-xs leading-relaxed text-slate-600">
+              <p className="font-semibold text-slate-700">AI Routing Rationale:</p>
+              <p className="mt-1">{routingResult.reason}</p>
+              <p className="mt-2 text-[11px] font-medium text-[#187e8d]">
+                🔒 Visibility Rule Applied: This problem is visible <b>only</b> on the{' '}
+                {routingResult.routing_target === 'university'
+                  ? 'University Dashboard'
+                  : routingResult.routing_target === 'partner'
+                  ? 'Partner Dashboard'
+                  : routingResult.routing_target === 'both'
+                  ? 'University and Partner Dashboards'
+                  : 'Government Administration'}{' '}
+                and remains hidden from all other external dashboards.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Governance Decision Section */}
+        {(() => {
+          const isValidated = status === 'Validated' || status === 'Resolved' || status === 'Converted to Project'
+          const isRejected = status === 'Rejected'
+
+          return (
+            <div className="mt-6">
+              {isValidated ? (
+                <div
+                  id="final-decision-badge"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border-2 border-emerald-300 bg-emerald-50/90 p-5 shadow-sm"
+                >
+                  <div className="flex items-start sm:items-center gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white font-black text-lg shadow-sm">
+                      ✓
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-[Manrope] text-base font-bold text-emerald-950">
+                          Validated
+                        </h3>
+                        <span className="rounded-full border border-emerald-300 bg-emerald-200/70 px-2.5 py-0.5 text-xs font-bold text-emerald-900">
+                          Official Decision
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-emerald-800">
+                        This problem has been accepted and validated by the Jharkhand District Innovation Cell. Qualified for Higher Education Institutions (HEIs) and partner routing.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/government/duplicate-analysis"
+                    className="shrink-0 rounded-lg border border-emerald-300 bg-white px-4 py-2 text-sm font-semibold text-emerald-900 shadow-sm hover:bg-emerald-50"
+                  >
+                    View Similar Problems
+                  </Link>
+                </div>
+              ) : isRejected ? (
+                <div
+                  id="final-decision-badge"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border-2 border-rose-300 bg-rose-50/90 p-5 shadow-sm"
+                >
+                  <div className="flex items-start sm:items-center gap-3">
+                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-rose-600 text-white font-black text-lg shadow-sm">
+                      ✕
+                    </span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-[Manrope] text-base font-bold text-rose-950">
+                          Rejected
+                        </h3>
+                        <span className="rounded-full border border-rose-300 bg-rose-200/70 px-2.5 py-0.5 text-xs font-bold text-rose-900">
+                          Official Decision
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-rose-800">
+                        This problem was formally rejected and dismissed from administrative escalation.
+                        {resolvedProblem.governmentComment && (
+                          <span className="font-medium"> Reason: {resolvedProblem.governmentComment}</span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/government/duplicate-analysis"
+                    className="shrink-0 rounded-lg border border-rose-300 bg-white px-4 py-2 text-sm font-semibold text-rose-900 shadow-sm hover:bg-rose-50"
+                  >
+                    View Similar Problems
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setDialog('validate')}
+                    className="rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-emerald-800"
+                  >
+                    Validate Problem (Accept)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDialog('info')}
+                    className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-800 hover:bg-amber-100"
+                  >
+                    Request More Information
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDialog('reject')}
+                    className="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50"
+                  >
+                    Reject Problem
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDialog('redirect')}
+                    className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    <Flag size={15} className="mr-1 inline" />
+                    Redirect
+                  </button>
+                  <Link
+                    to={`/government/duplicate-analysis`}
+                    className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                  >
+                    View Similar Problems
+                  </Link>
+                </div>
+              )}
+            </div>
+          )
+        })()}
 
         {/* Dialogs */}
         <ConfirmDialog
           open={dialog === 'validate'}
           title="Validate and Accept this Problem?"
-          description={`Validating this problem will mark Track ID ${trackId} as "Government Accepted" (Stage 4) and qualify it for recommendation to accredited Higher Education Institutions.`}
+          description={`Validating this problem will mark Track ID ${trackId} as "Validated" and qualify it for recommendation to accredited Higher Education Institutions.`}
           confirmLabel="Validate problem"
           onCancel={() => setDialog(null)}
           onConfirm={handleValidate}

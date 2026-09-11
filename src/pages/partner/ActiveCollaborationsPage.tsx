@@ -130,7 +130,7 @@ export function ActiveCollaborationsPage() {
         title="Contributions"
         description="Monitor ongoing partnerships, track milestones, and coordinate resource deployments."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Contributions' },
         ]}
       >

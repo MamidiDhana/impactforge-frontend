@@ -16,7 +16,7 @@ button, a { font: inherit; }
 button { cursor: pointer; }
 .app-frame { min-height: 100vh; overflow: hidden; background: #f7f9fc; }
 .site-header { width: min(1180px, calc(100% - 48px)); margin: 0 auto; height: 90px; display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 2; }
-.brand { display: inline-flex; align-items: center; gap: 10px; font-family: Manrope, sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.7px; color: #13243b; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: Manrope, sans-serif; font-weight: 800; font-size: 20px; letter-spacing: -0.7px; color: #13243b; user-select: none; caret-color: transparent; }
 .brand > span:last-child span { color: #1c91a1; }
 .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; color: white; background: #12365a; border-radius: 10px; box-shadow: 0 5px 14px #12365a2b; }
 .site-nav { display: flex; gap: 34px; margin-left: 110px; }

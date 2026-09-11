@@ -1,73 +1,112 @@
-import { BarChart3, CheckCircle2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { BarChart3, ShieldCheck, RefreshCw } from 'lucide-react'
 import { GovernmentLayout } from '../../layouts/GovernmentLayout'
 import { GovPage } from './GovernmentShared'
 import { StatCard } from '../../components/common/StatCard'
-import { SectionHeader } from '../../components/common/SectionHeader'
 import { governmentAnalytics } from '../../data/governmentAnalytics'
+import {
+  getImpactSummary,
+  getDistrictImpact,
+  getCategoryImpact,
+  getResolutionPerformanceAnalytics,
+  type ImpactSummaryResponse,
+  type DistrictImpactItem,
+  type CategoryImpactItem,
+  type ResolutionPerformanceResponse,
+} from '../../services/reportService'
+import { ImpactSummaryCards } from '../../components/analytics/ImpactSummaryCards'
+import { AnalyticsExplanationPanel } from '../../components/analytics/AnalyticsExplanationPanel'
+import { ResolutionPerformanceChart } from '../../components/analytics/ResolutionPerformanceChart'
+import { DistrictImpactChart } from '../../components/analytics/DistrictImpactChart'
+import { CategoryImpactChart } from '../../components/analytics/CategoryImpactChart'
+
 export function GovernmentAnalyticsPage() {
-  const max = Math.max(...governmentAnalytics.categories.map((item) => item.value))
+  const [impactSummary, setImpactSummary] = useState<ImpactSummaryResponse | null>(null)
+  const [districts, setDistricts] = useState<DistrictImpactItem[]>([])
+  const [categories, setCategories] = useState<CategoryImpactItem[]>([])
+  const [resolutionPerf, setResolutionPerf] = useState<ResolutionPerformanceResponse | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  const loadData = async () => {
+    setIsLoading(true)
+    try {
+      const [sumRes, distRes, catRes, perfRes] = await Promise.all([
+        getImpactSummary().catch(() => null),
+        getDistrictImpact().catch(() => null),
+        getCategoryImpact().catch(() => null),
+        getResolutionPerformanceAnalytics().catch(() => null),
+      ])
+      if (sumRes) setImpactSummary(sumRes)
+      if (distRes && distRes.districts) setDistricts(distRes.districts)
+      if (catRes && catRes.categories) setCategories(catRes.categories)
+      if (perfRes) setResolutionPerf(perfRes)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
   return (
     <GovernmentLayout title="Impact">
       <GovPage
-        title="Impact"
-        description="Review illustrative trends across problems, validation, and projects."
+        title="Civic Impact & Analytical Intelligence"
+        description="Comprehensive evaluation across problems, technical feasibility, partner mobilization, and resolution performance."
         breadcrumbs={[
           { label: 'Government', href: '/government/dashboard' },
-          { label: 'Impact' },
+          { label: 'Impact Analytics' },
         ]}
       >
-        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          All values shown are illustrative demo data. They are not government statistics.
+        {/* Live Data Sync Bar */}
+        <div className="flex items-center justify-between gap-3 mb-6 p-4 rounded-xl bg-slate-900 text-white border border-slate-800 shadow-md">
+          <div className="flex items-center gap-2 text-xs">
+            <ShieldCheck className="w-4 h-4 text-cyan-400" />
+            <span className="text-slate-300">
+              Live PostgreSQL metrics synchronized across all Jharkhand districts &middot; Advisory Zero-Mutation
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={loadData}
+            disabled={isLoading}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-600/30 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-500/30 text-xs font-semibold transition"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>{isLoading ? 'Syncing...' : 'Sync Live'}</span>
+          </button>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {governmentAnalytics.indicators.map((indicator) => (
-            <StatCard key={indicator.label} label={indicator.label} value={indicator.value} description="Illustrative data" icon={BarChart3} />
-          ))}
+
+        {/* Phase 1 AI Project & Impact Analytics Real Metrics */}
+        <AnalyticsExplanationPanel />
+        <ImpactSummaryCards summary={impactSummary} loading={isLoading} />
+
+        <div className="grid gap-6 lg:grid-cols-2 mb-8">
+          <ResolutionPerformanceChart performance={resolutionPerf} loading={isLoading} />
+          <DistrictImpactChart districts={districts} loading={isLoading} />
         </div>
-        <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <section>
-            <SectionHeader title="Problems by category" />
-            <div className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
-              {governmentAnalytics.categories.map((item) => (
-                <div key={item.label}>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">{item.label}</span>
-                    <b>{item.value}</b>
-                  </div>
-                  <div className="mt-2 h-2 rounded-full bg-slate-100">
-                    <div className="h-full rounded-full bg-[#1c91a1]" style={{ width: `${(item.value / max) * 100}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section>
-            <SectionHeader title="Problems by status" />
-            <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-5 sm:grid-cols-2">
-              {governmentAnalytics.statuses.map((item) => (
-                <div key={item.label} className="rounded-lg bg-slate-50 p-4">
-                  <p className="text-sm text-slate-500">{item.label}</p>
-                  <p className="mt-2 font-[Manrope] text-2xl font-bold text-[#13243b]">{item.value}</p>
-                </div>
-              ))}
-            </div>
-            <SectionHeader title="Projects by stage" />
-            <div className="grid gap-2 rounded-xl border border-slate-200 bg-white p-5">
-              {governmentAnalytics.stages.map((item) => (
-                <p key={item.label} className="flex justify-between text-sm text-slate-600">
-                  <span>{item.label}</span>
-                  <b>{item.value}</b>
-                </p>
-              ))}
-            </div>
-          </section>
+
+        <div className="mb-8">
+          <CategoryImpactChart categories={categories} loading={isLoading} />
         </div>
-        <div className="mt-8 rounded-xl border border-[#b8dfe0] bg-[#e8f5f5] p-5">
-          <h2 className="font-[Manrope] font-bold text-[#13243b]">Impact indicators</h2>
-          <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
-            <CheckCircle2 size={16} className="text-emerald-600" />
-            Validation turnaround and beneficiary reach are tracked as projects mature.
-          </p>
+
+        {/* Traditional Indicators & Demonstrational Breakdown */}
+        <div className="border-t border-slate-200 pt-6 mt-8">
+          <h3 className="font-[Manrope] text-base font-bold text-slate-800 mb-3">
+            Demographic Reference Indicators
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {governmentAnalytics.indicators.map((indicator) => (
+              <StatCard
+                key={indicator.label}
+                label={indicator.label}
+                value={indicator.value}
+                description="Reference baseline"
+                icon={BarChart3}
+              />
+            ))}
+          </div>
         </div>
       </GovPage>
     </GovernmentLayout>

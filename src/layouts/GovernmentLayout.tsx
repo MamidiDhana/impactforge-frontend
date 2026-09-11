@@ -2,7 +2,6 @@ import { useState, type ReactNode } from 'react'
 import {
   BarChart3,
   Bell,
-  ClipboardCheck,
   FileSearch,
   FolderKanban,
   History,
@@ -25,7 +24,6 @@ interface GovernmentLayoutProps {
 const governmentNavItems = [
   { label: 'Government', href: '/government/dashboard', icon: LayoutDashboard },
   { label: 'Problem Queue', href: '/government/problem-queue', icon: FileSearch },
-  { label: 'Validation', href: '/government/validation', icon: ClipboardCheck },
   { label: 'Duplicates', href: '/government/duplicate-analysis', icon: Network },
   { label: 'Validated', href: '/government/validated-problems', icon: ShieldCheck },
   { label: 'HEI Match', href: '/government/hei-matching', icon: Network },

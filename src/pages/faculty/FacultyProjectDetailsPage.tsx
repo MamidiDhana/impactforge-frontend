@@ -18,8 +18,9 @@ import {
   X,
 } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
-import { FacultyStudentLayout } from '../../layouts/FacultyStudentLayout'
-import { WorkspacePage } from '../workspace/WorkspaceShared'
+import { HEILayout } from '../../layouts/HEILayout'
+import { PageContainer } from '../../components/common/PageContainer'
+import { PageHeader } from '../../components/common/PageHeader'
 import { ResponsiveCard } from '../../components/common/ResponsiveCard'
 import { Modal } from '../../components/common/Modal'
 import { facultyProjects } from '../../data/facultyProjects'
@@ -298,18 +299,27 @@ export function FacultyProjectDetailsPage() {
   const projectMilestones = facultyMilestones.filter((m) => m.project === project.title || project.id === 'wp1')
 
   return (
-    <FacultyStudentLayout role="faculty" title={`Project: ${project.title}`}>
-      <WorkspacePage
-        role="faculty"
-        title={project.title}
-        description="Faculty project workspace: supervise student innovators, assign tasks, review submitted deliverables, and communicate project updates."
-        breadcrumbs={[
-          { label: 'Faculty', href: '/faculty/dashboard' },
-          { label: 'Projects', href: '/faculty/projects' },
-          { label: project.title },
-        ]}
-        action={
-          <div className="flex flex-wrap items-center gap-2.5">
+    <HEILayout
+      title={`Project: ${project.title}`}
+      breadcrumbs={[
+        { label: 'University Portal', href: '/university' },
+        { label: 'Faculty', href: '/university/faculty' },
+        { label: 'Projects', href: '/university/faculty/projects' },
+        { label: project.title },
+      ]}
+    >
+      <PageContainer>
+        <PageHeader
+          title={project.title}
+          description="Faculty project workspace: supervise student innovators, assign tasks, review submitted deliverables, and communicate project updates."
+          breadcrumbs={[
+            { label: 'University Portal', href: '/university' },
+            { label: 'Faculty', href: '/university/faculty' },
+            { label: 'Projects', href: '/university/faculty/projects' },
+            { label: project.title },
+          ]}
+          action={
+            <div className="flex flex-wrap items-center gap-2.5">
             <button
               type="button"
               onClick={() => setCreateTaskOpen(true)}
@@ -342,7 +352,7 @@ export function FacultyProjectDetailsPage() {
             </Link>
           </div>
         }
-      >
+      />
         <div className="space-y-6">
           {/* Status Feedback Toast */}
           {feedback && (
@@ -1022,7 +1032,7 @@ export function FacultyProjectDetailsPage() {
                     </h3>
                   </div>
                   <Link
-                    to="/faculty/milestones"
+                    to="/university/faculty/reports"
                     className="text-xs font-bold text-[#187e8d] hover:underline"
                   >
                     Manage all milestones &rarr;
@@ -1511,7 +1521,7 @@ export function FacultyProjectDetailsPage() {
             </div>
           </form>
         </Modal>
-      </WorkspacePage>
-    </FacultyStudentLayout>
+      </PageContainer>
+    </HEILayout>
   )
 }

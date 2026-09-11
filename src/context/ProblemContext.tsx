@@ -1,11 +1,16 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useState, useCallback, type ReactNode } from 'react'
 import type { CitizenFeedback, CitizenProblem, JharkhandLanguage, TrackingStage } from '../types'
 import {
   buildInitialStages,
-  INITIAL_JHARKHAND_PROBLEMS,
   JHARKHAND_LANGUAGES,
   type LanguageDictionary,
 } from '../data/jharkhandData'
+import {
+  getReports,
+  isCitizenSubmittedReport,
+  deduplicateReports,
+  mapBackendReportToCitizenProblem,
+} from '../services/reportService'
 import { useAuth } from './AuthContext'
 
 const PROBLEMS_STORAGE_KEY = 'impactforge.jharkhand.problems.v1'
@@ -14,6 +19,9 @@ const LANGUAGE_STORAGE_KEY = 'impactforge.citizen.language'
 interface ProblemContextValue {
   problems: CitizenProblem[]
   citizenProblems: CitizenProblem[]
+  isLoading: boolean
+  error: string | null
+  reloadProblems: () => Promise<void>
   language: JharkhandLanguage
   setLanguage: (lang: JharkhandLanguage) => void
   dict: LanguageDictionary
@@ -49,15 +57,16 @@ const ProblemContext = createContext<ProblemContextValue | undefined>(undefined)
 function loadStoredProblems(): CitizenProblem[] {
   try {
     const raw = localStorage.getItem(PROBLEMS_STORAGE_KEY)
-    if (!raw) return INITIAL_JHARKHAND_PROBLEMS
-    const parsed = JSON.parse(raw)
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed
+      }
     }
   } catch {
     // fallback
   }
-  return INITIAL_JHARKHAND_PROBLEMS
+  return []
 }
 
 function loadStoredLanguage(): JharkhandLanguage {
@@ -75,7 +84,31 @@ function loadStoredLanguage(): JharkhandLanguage {
 export function ProblemProvider({ children }: { children: ReactNode }) {
   const { currentUser } = useAuth()
   const [problems, setProblems] = useState<CitizenProblem[]>(loadStoredProblems)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
   const [language, setLanguageState] = useState<JharkhandLanguage>(loadStoredLanguage)
+
+  // Load live citizen problems from existing PostgreSQL/Supabase database on mount
+  const loadLiveProblems = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const data = await getReports()
+      const citizenReports = data.filter(isCitizenSubmittedReport)
+      const deduplicated = deduplicateReports(citizenReports)
+      const mapped = deduplicated.map(mapBackendReportToCitizenProblem)
+      setProblems(mapped)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to connect to backend server.'
+      setError(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadLiveProblems()
+  }, [loadLiveProblems])
 
   // Persist problems to localStorage
   useEffect(() => {
@@ -181,15 +214,16 @@ export function ProblemProvider({ children }: { children: ReactNode }) {
     return newProblem
   }
 
-  const updateProblemStatus = (
+  const updateProblemStatus = useCallback((
     id: string,
     status: CitizenProblem['status'],
     stageIndex?: number,
     comment?: string
   ) => {
+    const clean = id.startsWith('report-') ? id.replace('report-', '') : id
     setProblems((prev) =>
       prev.map((p) => {
-        if (p.id !== id && p.trackId !== id) return p
+        if (p.id !== id && p.trackId !== id && p.id !== clean && p.trackId !== clean) return p
 
         const effectiveStageIndex =
           stageIndex !== undefined
@@ -226,7 +260,7 @@ export function ProblemProvider({ children }: { children: ReactNode }) {
         }
       })
     )
-  }
+  }, [])
 
   const submitCitizenFeedback = (trackId: string, feedback: CitizenFeedback) => {
     setProblems((prev) =>
@@ -269,6 +303,9 @@ export function ProblemProvider({ children }: { children: ReactNode }) {
       value={{
         problems,
         citizenProblems,
+        isLoading,
+        error,
+        reloadProblems: loadLiveProblems,
         language,
         setLanguage,
         dict,

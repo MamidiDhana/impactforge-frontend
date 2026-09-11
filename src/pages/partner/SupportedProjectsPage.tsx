@@ -5,7 +5,6 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  Download,
   ExternalLink,
   FileCheck,
   MapPin,
@@ -26,7 +25,6 @@ type ProjectTab = 'All' | 'Ongoing' | 'Completed'
 export function SupportedProjectsPage() {
   const [activeTab, setActiveTab] = useState<ProjectTab>('All')
   const [selectedReport, setSelectedReport] = useState<SupportedProject | null>(null)
-  const [downloadNotice, setDownloadNotice] = useState<string | null>(null)
 
   // Map active collaborations into unified supported projects format
   const ongoingProjects: SupportedProject[] = activeCollaborations.map((collab) => ({
@@ -65,31 +63,17 @@ export function SupportedProjectsPage() {
     return true
   })
 
-  const handleMockDownload = (title: string) => {
-    setDownloadNotice(`Impact Report for "${title}" generated! Mock PDF download completed.`)
-    setTimeout(() => setDownloadNotice(null), 4000)
-  }
-
   return (
     <PartnerLayout title="Documents">
       <PartnerPage
         title="Documents"
         description="Monitor co-innovations and review audited impact results and project documentation."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Documents' },
         ]}
       >
         <div className="space-y-6">
-          {downloadNotice && (
-            <div
-              role="status"
-              className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800 animate-in fade-in"
-            >
-              <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
-              <span>{downloadNotice}</span>
-            </div>
-          )}
 
           {/* Stats Summary Bar */}
           <div className="grid gap-4 sm:grid-cols-3">
@@ -343,21 +327,13 @@ export function SupportedProjectsPage() {
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
+              <div className="mt-6 flex items-center justify-end border-t border-slate-100 pt-4">
                 <button
                   type="button"
                   onClick={() => setSelectedReport(null)}
                   className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
                 >
                   Close
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleMockDownload(selectedReport.projectTitle)}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#12365a] px-4 py-2 text-xs font-bold text-white hover:bg-[#1a4a7a]"
-                >
-                  <Download size={14} />
-                  Download Impact Audit (PDF)
                 </button>
               </div>
             </div>

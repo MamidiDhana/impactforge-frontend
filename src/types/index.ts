@@ -212,8 +212,33 @@ export interface PublicProblem extends Problem {
   relatedProjectIds?: string[]
 }
 export interface University {
-  id: string; name: string; location: string; description: string; capabilities: string[]
-  facultyCount: number; activeProjects: number; verified: boolean
+  id: string
+  name: string
+  location: string
+  description: string
+  capabilities: string[]
+  facultyCount: number
+  activeProjects: number
+  verified: boolean
+  hei_id?: string
+  district?: string
+  state?: string
+  institution_type?: string
+  departments?: string[]
+  available_skills?: string[]
+  technical_domains?: string[]
+  laboratories?: string[]
+  equipment?: string[]
+  software_tools?: string[]
+  project_experience?: {
+    completed_civic_projects?: number
+    active_projects?: number
+    complexity_level?: string
+    [key: string]: unknown
+  }
+  available_faculty_capacity?: number
+  verification_status?: string
+  contact_email?: string | null
 }
 export type PartnerType = 'Industry' | 'MSME' | 'Startup' | 'Research Organization' | 'CSR Organization' | 'Non-profit Organization'
 export interface Partner {

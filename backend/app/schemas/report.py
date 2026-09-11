@@ -67,6 +67,7 @@ class ReportStatus(str, Enum):
     IN_PROGRESS = "In Progress"
     RESOLVED = "Resolved"
     REJECTED = "Rejected"
+    VALIDATED = "Validated"
 
 
 class ReportBase(BaseModel):
@@ -131,6 +132,34 @@ class ReportCreate(ReportBase):
 
 class ReportStatusUpdate(BaseModel):
     status: ReportStatus = Field(..., description="Updated status (Open, In Progress, Resolved, Rejected)")
+    remarks: Optional[str] = Field(None, description="Optional notes/remarks on the status change")
+
+
+class ReportAssignmentUpdate(BaseModel):
+    assigned_to: str = Field(..., min_length=2, max_length=255, description="Name or team assigned")
+    assigned_role: Optional[str] = Field(None, description="Role or department assigned (e.g. government, hei, faculty, partner)")
+    remarks: Optional[str] = Field(None, description="Optional assignment justification")
+
+
+class ReportRemarksUpdate(BaseModel):
+    official_remarks: str = Field(..., description="Official government / department remarks")
+
+
+class ReportVerificationUpdate(BaseModel):
+    verification_status: str = Field(..., description="Verification status: 'Verified', 'Pending Verification', or 'Rejected'")
+    official_remarks: Optional[str] = Field(None, description="Official government verification remarks")
+
+
+class ReportStatusHistoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    report_id: int
+    previous_status: Optional[str] = None
+    new_status: str
+    changed_by: Optional[str] = None
+    changed_at: datetime
+    remarks: Optional[str] = None
 
 
 class ReportResponse(BaseModel):
@@ -150,5 +179,94 @@ class ReportResponse(BaseModel):
     longitude: Optional[float] = None
     priority: str
     status: str
+    verification_status: Optional[str] = "Pending Verification"
+    citizen_id: Optional[int] = None
+    assigned_to: Optional[str] = None
+    assigned_role: Optional[str] = None
+    assigned_by: Optional[str] = None
+    assigned_at: Optional[datetime] = None
+    official_remarks: Optional[str] = None
+    remarks_updated_by: Optional[str] = None
+    remarks_updated_at: Optional[datetime] = None
+    resolved_at: Optional[datetime] = None
+    # AI Categorization and Analysis (Phase 1 Part 1)
+    ai_category: Optional[str] = None
+    ai_subcategory: Optional[str] = None
+    ai_problem_type: Optional[str] = None
+    ai_summary: Optional[str] = None
+    ai_confidence_score: Optional[float] = None
+    ai_analysis_status: Optional[str] = None
+    ai_model: Optional[str] = None
+    ai_analyzed_at: Optional[datetime] = None
+    # AI Priority Scoring (Phase 1 Part 2)
+    ai_priority: Optional[str] = None
+    ai_priority_score: Optional[int] = None
+    ai_priority_reasons: Optional[List[str]] = None
+    ai_priority_factors: Optional[Dict[str, Any]] = None
+    ai_priority_status: Optional[str] = None
+    ai_priority_model: Optional[str] = None
+    ai_priority_analyzed_at: Optional[datetime] = None
+    # AI Similar-Problem Detection (Phase 1 Part 3)
+    ai_similarity_status: Optional[str] = None
+    ai_similarity_matches: Optional[List[Dict[str, Any]]] = None
+    ai_similarity_model: Optional[str] = None
+    ai_similarity_analyzed_at: Optional[datetime] = None
+    # AI Official Duplicate Analysis (Phase 1 Part 4)
+    ai_duplicate_status: Optional[str] = None
+    ai_duplicate_candidates: Optional[List[Dict[str, Any]]] = None
+    ai_duplicate_model: Optional[str] = None
+    ai_duplicate_analyzed_at: Optional[datetime] = None
+    # AI Capability Extraction (Phase 1 Part 5)
+    ai_capability_status: Optional[str] = None
+    ai_capabilities: Optional[Any] = None
+    ai_capability_confidence: Optional[float] = None
+    ai_capability_reasons: Optional[List[str]] = None
+    ai_capability_model: Optional[str] = None
+    ai_capability_analyzed_at: Optional[datetime] = None
+    # AI HEI Matching (Phase 1 Part 6)
+    ai_hei_matching_status: Optional[str] = None
+    ai_hei_matches: Optional[List[Dict[str, Any]]] = None
+    ai_hei_matching_analyzed_at: Optional[datetime] = None
+    ai_hei_matching_model: Optional[str] = None
+    # AI Faculty and Student Matching (Phase 1 Part 7)
+    ai_faculty_matching_status: Optional[str] = None
+    ai_faculty_matches: Optional[List[Dict[str, Any]]] = None
+    ai_student_matches: Optional[List[Dict[str, Any]]] = None
+    ai_faculty_matching_model: Optional[str] = None
+    ai_faculty_matching_analyzed_at: Optional[datetime] = None
+    # AI Capability-Gap Analysis (Phase 1 Part 8)
+    ai_capability_gap_status: Optional[str] = None
+    ai_capability_gap_analysis: Optional[Dict[str, Any]] = None
+    ai_capability_gap_score: Optional[float] = None
+    ai_capability_gap_severity: Optional[str] = None
+    ai_capability_gap_model: Optional[str] = None
+    ai_capability_gap_analyzed_at: Optional[datetime] = None
+    # AI Partner Matching (Phase 1 Part 9)
+    ai_partner_matching_status: Optional[str] = None
+    ai_partner_matches: Optional[List[Dict[str, Any]]] = None
+    ai_partner_matching_model: Optional[str] = None
+    ai_partner_matching_analyzed_at: Optional[datetime] = None
+    # AI Dynamic Re-Matching (Phase 1 Part 10)
+    ai_rematching_status: Optional[str] = None
+    ai_last_rematched_at: Optional[datetime] = None
+    ai_rematching_reason: Optional[str] = None
+    ai_rematching_version: Optional[int] = 1
+    # AI Project and Impact Analytics (Phase 1 Part 11)
+    ai_project_analytics_status: Optional[str] = None
+    ai_project_analytics: Optional[Dict[str, Any]] = None
+    ai_project_feasibility_score: Optional[float] = None
+    ai_project_impact_score: Optional[float] = None
+    ai_project_readiness_score: Optional[float] = None
+    ai_project_risk_score: Optional[float] = None
+    ai_project_analytics_model: Optional[str] = None
+    ai_project_analytics_analyzed_at: Optional[datetime] = None
+    # AI-Driven Problem Routing & Dashboard Assignment (Government Validation Flow)
+    routing_target: Optional[str] = None
+    requires_funding: Optional[bool] = None
+    university_can_solve: Optional[bool] = None
+    ai_routing_reason: Optional[str] = None
+    ai_routing_analyzed_at: Optional[datetime] = None
+    ai_routing_model: Optional[str] = None
     created_at: datetime
     updated_at: datetime
+

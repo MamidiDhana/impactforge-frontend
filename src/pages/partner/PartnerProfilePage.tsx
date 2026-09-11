@@ -18,7 +18,7 @@ export function PartnerProfilePage() {
         title="Profile"
         description="Maintain your organizational identity, capabilities, and resource offerings for accurate project matching."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Profile' },
         ]}
       >

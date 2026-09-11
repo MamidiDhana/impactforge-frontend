@@ -1,4 +1,4 @@
-import { Bell, FilePlus2, FolderKanban, HelpCircle, Search, ShieldCheck, Compass } from 'lucide-react'
+import { Bell, CheckCircle2, Compass, FilePlus2, HelpCircle, MessageSquare, Search, ShieldCheck } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { CitizenLayout } from '../../layouts/CitizenLayout'
 import { PageHeader } from '../../components/common/PageHeader'
@@ -8,6 +8,7 @@ import { StatCard } from '../../components/common/StatCard'
 import { QuickActionCard } from '../../components/dashboard/QuickActionCard'
 import { SectionHeader } from '../../components/common/SectionHeader'
 import { CitizenStatusBadge } from '../../components/citizen/CitizenStatusBadge'
+import { AnnouncementBanner } from '../../components/notifications/AnnouncementBanner'
 import { citizenNotifications } from '../../data/citizenNotifications'
 import { useProblems } from '../../context/ProblemContext'
 
@@ -25,6 +26,7 @@ export function CitizenDashboardPage() {
 
   const underReviewCount = citizenProblems.filter((p) => p.status === 'Under Review' || p.status === 'Submitted').length
   const validatedCount = citizenProblems.filter((p) => p.status === 'Validated' || p.status === 'Converted to Project').length
+  const resolvedCount = citizenProblems.filter((p) => p.status === 'Resolved').length
 
   return (
     <CitizenLayout title="Citizen">
@@ -43,14 +45,17 @@ export function CitizenDashboardPage() {
           }
         />
 
+        {/* Role-Filtered Announcement Banner */}
+        <AnnouncementBanner />
+
         <DashboardWelcome
-          name="Reports Overview"
+          name="Track Problem Overview"
           description="Report local challenges in Jharkhand, follow permanent Track IDs, and observe solutions built through university-partner collaboration."
         />
 
         <section>
           <SectionHeader
-            title="Your Impact & Reports Overview"
+            title="Your Impact & Problem Tracking Overview"
             description="Jharkhand State Citizen Innovation metrics."
           />
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -73,10 +78,10 @@ export function CitizenDashboardPage() {
               icon={ShieldCheck}
             />
             <StatCard
-              label="Active Project Pilots"
-              value="2"
-              description="University Collaborations"
-              icon={FolderKanban}
+              label="Resolved Problems"
+              value={String(resolvedCount)}
+              description="Community Solutions"
+              icon={CheckCircle2}
             />
           </div>
         </section>
@@ -90,24 +95,25 @@ export function CitizenDashboardPage() {
               icon={FilePlus2}
               onClick={() => navigate('/citizen/submit-problem')}
             />
-            <QuickActionCard
-              title="Track Problem"
-              description="Follow the 15-stage resolution lifecycle."
-              icon={Compass}
-              onClick={() => navigate('/citizen/track')}
-            />
             <Link to="/citizen/problems">
               <QuickActionCard
-                title="Reports"
-                description="Inspect statuses, audit logs, and feedback."
-                icon={Search}
+                title="Track Problem"
+                description="Review reported problems and follow live resolution progress."
+                icon={Compass}
               />
             </Link>
-            <Link to="/citizen/projects">
+            <Link to="/citizen/feedback">
               <QuickActionCard
-                title="Projects"
-                description="Follow working student & partner prototypes."
-                icon={FolderKanban}
+                title="Feedback"
+                description="Provide feedback on problem resolutions."
+                icon={MessageSquare}
+              />
+            </Link>
+            <Link to="/citizen/notifications">
+              <QuickActionCard
+                title="Alerts"
+                description="Stay informed about problem updates and validations."
+                icon={Bell}
               />
             </Link>
           </div>
@@ -140,16 +146,10 @@ export function CitizenDashboardPage() {
                 <div className="flex items-center justify-between gap-3 sm:justify-end">
                   <CitizenStatusBadge status={problem.status} />
                   <Link
-                    to={`/citizen/track/${problem.trackId}`}
-                    className="rounded-lg border border-[#187e8d] px-3 py-1.5 text-xs font-bold text-[#187e8d] hover:bg-[#e8f5f5]"
-                  >
-                    Track
-                  </Link>
-                  <Link
                     to={`/citizen/problems/${problem.id}`}
-                    className="text-xs font-semibold text-slate-600 hover:text-slate-900"
+                    className="rounded-lg border border-[#12365a] px-3 py-1.5 text-xs font-bold text-[#12365a] transition hover:bg-slate-50"
                   >
-                    Details
+                    Track Status
                   </Link>
                 </div>
               </div>

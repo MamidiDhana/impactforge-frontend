@@ -14,6 +14,7 @@ import { JharkhandMapPicker } from '../../components/citizen/JharkhandMapPicker'
 import { TrackIdConfirmationModal } from '../../components/citizen/TrackIdConfirmationModal'
 import { useAuth } from '../../context/AuthContext'
 import { useProblems } from '../../context/ProblemContext'
+import { useNotifications } from '../../context/NotificationContext'
 import { JHARKHAND_DISTRICTS, REPORT_PROBLEM_TRANSLATIONS } from '../../data/jharkhandData'
 import { createReport, mapBackendReportToCitizenProblem, type BackendReportPayload } from '../../services/reportService'
 import type { CitizenProblem } from '../../types'
@@ -63,6 +64,7 @@ export function SubmitProblemPage() {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const { addBackendProblem, language } = useProblems()
+  const { notify } = useNotifications()
 
   const t = REPORT_PROBLEM_TRANSLATIONS[language] || REPORT_PROBLEM_TRANSLATIONS.en
 
@@ -128,6 +130,18 @@ export function SubmitProblemPage() {
       const mappedProblem = mapBackendReportToCitizenProblem(backendReport)
       addBackendProblem(mappedProblem)
       setCreatedProblem(mappedProblem)
+
+      // Emit notification for citizen and administration
+      notify({
+        type: 'report_submitted',
+        title: 'Report Registered Successfully',
+        message: `Problem "${backendReport.problem_title}" was registered in PostgreSQL (Track ID: ${backendReport.track_id}).`,
+        targetRole: ['citizen', 'government', 'admin'],
+        relatedTrackId: backendReport.track_id,
+        priority: (values.urgency as any) || 'Normal',
+        source: 'Citizen Portal',
+        actionUrl: `/citizen/problems/${backendReport.track_id}`,
+      })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred while submitting.'
       setApiError(message)

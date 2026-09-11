@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { Bell, Compass, FilePlus2, FolderKanban, LayoutDashboard, MessageSquare, UserRound } from 'lucide-react'
+import { Bell, Compass, FilePlus2, LayoutDashboard, MessageSquare, UserRound } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { DashboardSidebar } from '../components/navigation/DashboardSidebar'
 import { DashboardTopbar } from '../components/navigation/DashboardTopbar'
@@ -28,9 +28,7 @@ export function CitizenLayout({ children, title, breadcrumbs }: CitizenLayoutPro
   const items = [
     { label: 'Citizen', href: '/citizen/dashboard', icon: LayoutDashboard },
     { label: 'Report Problem', href: '/citizen/submit-problem', icon: FilePlus2 },
-    { label: 'Track Problem', href: '/citizen/track', icon: Compass },
-    { label: 'Reports', href: '/citizen/problems', icon: FolderKanban },
-    { label: 'Projects', href: '/citizen/projects', icon: FolderKanban },
+    { label: 'Track Problem', href: '/citizen/problems', icon: Compass },
     { label: 'Feedback', href: '/citizen/feedback', icon: MessageSquare },
     { label: 'Alerts', href: '/citizen/notifications', icon: Bell },
     { label: 'Profile', href: '/citizen/profile', icon: UserRound },

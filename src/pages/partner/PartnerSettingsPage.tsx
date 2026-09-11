@@ -72,7 +72,7 @@ export function PartnerSettingsPage() {
         title="Settings"
         description="Configure your organization's notification preferences, privacy visibility, and security."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Settings' },
         ]}
       >

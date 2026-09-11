@@ -1,26 +1,158 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import {
   GraduationCap,
   CheckCircle2,
   MapPin,
   Search,
+  RefreshCw,
 } from 'lucide-react'
 import { AdminLayout } from '../../layouts/AdminLayout'
 import { AdminPage } from '../../components/admin/AdminShared'
 import { EmptyState } from '../../components/common/EmptyState'
-import { adminOrganizations as initialOrganizations } from '../../data/adminMockData'
+import { universities as defaultUniversities } from '../../data/universities'
+import type { University } from '../../types'
 import type { AdminOrganization } from '../../types/admin'
+
+interface BackendHEIRecord {
+  hei_id: string
+  name: string
+  district: string
+  state: string
+  institution_type: string
+  departments?: string[]
+  available_skills?: string[]
+  technical_domains?: string[]
+  laboratories?: string[]
+  equipment?: string[]
+  software_tools?: string[]
+  project_experience?: {
+    completed_civic_projects?: number
+    active_projects?: number
+    complexity_level?: string
+    [key: string]: unknown
+  }
+  available_faculty_capacity?: number
+  verification_status?: string
+  contact_email?: string | null
+}
+
+const DEAN_CONTACTS: Record<string, string> = {
+  'bit-mesra': 'Dr. Ramesh Chandra (Dean of R&D)',
+  'bau-ranchi': 'Dr. A.K. Sarkar (Dean of Agriculture)',
+  'cuj-ranchi': 'Prof. Manoj Kumar (Dean of Academics)',
+  'coep-pune': 'Dr. Arjun Menon (Dean of Innovation)',
+  'gujarat-university': 'Prof. Himanshu Pandya (Director of R&D)',
+  'iisc-bengaluru': 'Prof. Rajesh Sundaresan (Dean of Research)',
+  'iit-ism-dhanbad': 'Prof. Sagar Pal (Dean of R&D)',
+  'iit-bhubaneswar': 'Prof. P.R. Sahu (Dean of Academic Affairs)',
+  'iit-delhi': 'Prof. Ambuj Sagar (Dean of Corporate Relations & R&D)',
+  'iit-madras': 'Prof. Manu Santhanam (Dean of IC&SR)',
+  'iiit-hyderabad': 'Prof. P.J. Narayanan (Dean of R&D)',
+  'jadavpur-kolkata': 'Prof. Chiranjib Bhattacharjee (Dean of Engineering)',
+  'nit-jamshedpur': 'Dr. R.V. Sharma (Dean of Academic Affairs)',
+  'nit-surathkal': 'Dr. Meera Nair (Head, Telemetry Research)',
+  'symbiosis-design': 'Dr. Sanjeevani Ayachit (Director & Academic Dean)',
+  'tiss-mumbai': 'Prof. Shalini Bharat (Director & Dean)',
+  'uas-dharwad': 'Dr. P.L. Patil (Director of Research)',
+}
+
+function mapUniversityToAdminOrg(
+  uni: University,
+  live?: BackendHEIRecord
+): AdminOrganization {
+  const isVerified =
+    live?.verification_status?.toLowerCase() === 'verified' ||
+    (!live && uni.verified && uni.verification_status?.toLowerCase() === 'verified')
+
+  const deanContact =
+    DEAN_CONTACTS[uni.id] ||
+    (uni.hei_id ? DEAN_CONTACTS[uni.hei_id] : undefined) ||
+    'Dean of Academic Research & Innovation'
+
+  const location =
+    live?.district && live?.state
+      ? `${live.district}, ${live.state}`
+      : uni.location || `${uni.district}, ${uni.state}`
+
+  const stateCode = (uni.state || live?.state || 'JH').slice(0, 2).toUpperCase()
+  const cleanId = uni.id.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6)
+  const legalId = `HEI-${stateCode}-${cleanId}-2025`
+
+  return {
+    id: uni.id,
+    name: live?.name || uni.name,
+    type: (live?.institution_type || uni.institution_type || 'Universities') as AdminOrganization['type'],
+    contactPerson: deanContact,
+    email: live?.contact_email || uni.contact_email || `rnd@${uni.id}.ac.in`,
+    registrationDate: '10 Jan 2025',
+    verificationStatus: (isVerified ? 'Verified' : 'Pending') as AdminOrganization['verificationStatus'],
+    documentsStatus: (isVerified ? 'Verified' : 'Submitted') as AdminOrganization['documentsStatus'],
+    location,
+    website: `https://${uni.id}.ac.in`,
+    legalId,
+  }
+}
 
 export function AdminHEIRegistryPage() {
   const [organizations, setOrganizations] = useState<AdminOrganization[]>(() =>
-    initialOrganizations.filter(
-      (org) => org.type === 'Universities' || org.type === 'Research Institutions'
-    )
+    defaultUniversities.map((u) => mapUniversityToAdminOrg(u))
   )
+  const [isLoading, setIsLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [feedback, setFeedback] = useState<string | null>(null)
   const [selectedOrg, setSelectedOrg] = useState<AdminOrganization | null>(null)
+
+  // Fetch real HEI registry records from existing backend database API
+  const fetchRegistry = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const apiBase = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:8000'
+      const res = await fetch(`${apiBase}/api/reports/heis/registry`)
+      if (!res.ok) return
+
+      const backendHEIs: BackendHEIRecord[] = await res.json()
+      if (!Array.isArray(backendHEIs) || backendHEIs.length === 0) return
+
+      const backendMap = new Map(backendHEIs.map((h) => [h.hei_id, h]))
+
+      const mappedList: AdminOrganization[] = defaultUniversities.map((uni) => {
+        const live = backendMap.get(uni.id) || backendMap.get(uni.hei_id || '')
+        return mapUniversityToAdminOrg(uni, live)
+      })
+
+      backendHEIs.forEach((live) => {
+        if (!mappedList.some((m) => m.id === live.hei_id)) {
+          const isVerified = live.verification_status?.toLowerCase() === 'verified'
+          const deanContact =
+            DEAN_CONTACTS[live.hei_id] || 'Dean of Academic Research & Innovation'
+          mappedList.push({
+            id: live.hei_id,
+            name: live.name,
+            type: (live.institution_type || 'Universities') as AdminOrganization['type'],
+            contactPerson: deanContact,
+            email: live.contact_email || `rnd@${live.hei_id}.ac.in`,
+            registrationDate: '10 Jan 2025',
+            verificationStatus: (isVerified ? 'Verified' : 'Pending') as AdminOrganization['verificationStatus'],
+            documentsStatus: (isVerified ? 'Verified' : 'Submitted') as AdminOrganization['documentsStatus'],
+            location: `${live.district}, ${live.state}`,
+            website: `https://${live.hei_id}.ac.in`,
+            legalId: `HEI-${live.state.slice(0, 2).toUpperCase()}-${live.hei_id.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6)}-2025`,
+          })
+        }
+      })
+
+      setOrganizations(mappedList)
+    } catch {
+      // Keep initial mapped default list if backend is unreachable
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchRegistry()
+  }, [fetchRegistry])
 
   const filteredHEIs = useMemo(() => {
     return organizations.filter((org) => {
@@ -60,6 +192,16 @@ export function AdminHEIRegistryPage() {
             <span className="rounded-lg bg-[#e8f5f5] px-3 py-1.5 text-xs font-bold text-[#187e8d]">
               {filteredHEIs.length} Accredited HEIs
             </span>
+            <button
+              type="button"
+              onClick={fetchRegistry}
+              disabled={isLoading}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
+              title="Reload HEI profiles from backend"
+            >
+              <RefreshCw size={13} className={isLoading ? 'animate-spin text-[#187e8d]' : 'text-slate-600'} />
+              <span>{isLoading ? 'Syncing...' : 'Sync Registry'}</span>
+            </button>
           </div>
         }
       >

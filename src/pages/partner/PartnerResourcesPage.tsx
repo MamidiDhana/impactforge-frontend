@@ -166,7 +166,7 @@ export function PartnerResourcesPage() {
         title="Resources"
         description="Catalog and manage pledged equipment, software grants, funding, and mentor support."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Resources' },
         ]}
         action={

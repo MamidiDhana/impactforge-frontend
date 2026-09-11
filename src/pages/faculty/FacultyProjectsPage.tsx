@@ -9,20 +9,20 @@ import {
   Users,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { FacultyStudentLayout } from '../../layouts/FacultyStudentLayout'
-import { WorkspacePage } from '../workspace/WorkspaceShared'
-import { EmptyState } from '../../components/common/EmptyState'
+import { HEILayout } from '../../layouts/HEILayout'
+import { PageContainer } from '../../components/common/PageContainer'
+import { PageHeader } from '../../components/common/PageHeader'
 import { facultyProjects } from '../../data/facultyProjects'
+import { EmptyState } from '../../components/common/EmptyState'
 
 export function FacultyProjectsPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [categoryFilter, setCategoryFilter] = useState('All')
 
-  const categories = useMemo(
-    () => ['All', ...Array.from(new Set(facultyProjects.map((p) => p.category)))],
-    []
-  )
+  const categories = useMemo(() => {
+    return ['All', ...Array.from(new Set(facultyProjects.map((p) => p.category)))]
+  }, [])
 
   const stages = useMemo(
     () => ['All', ...Array.from(new Set(facultyProjects.map((p) => p.stage)))],
@@ -46,16 +46,24 @@ export function FacultyProjectsPage() {
   }, [search, statusFilter, categoryFilter])
 
   return (
-    <FacultyStudentLayout role="faculty" title="Projects">
-      <WorkspacePage
-        role="faculty"
-        title="Projects"
-        description="Oversee mentored research initiatives, monitor development stages, and review team outputs."
-        breadcrumbs={[
-          { label: 'Faculty', href: '/faculty/dashboard' },
-          { label: 'Projects' },
-        ]}
-      >
+    <HEILayout
+      title="Projects"
+      breadcrumbs={[
+        { label: 'University Portal', href: '/university' },
+        { label: 'Faculty', href: '/university/faculty' },
+        { label: 'Projects' },
+      ]}
+    >
+      <PageContainer>
+        <PageHeader
+          title="Projects"
+          description="Oversee mentored research initiatives, monitor development stages, and review team outputs."
+          breadcrumbs={[
+            { label: 'University Portal', href: '/university' },
+            { label: 'Faculty', href: '/university/faculty' },
+            { label: 'Projects' },
+          ]}
+        />
         <div className="space-y-6">
           {/* Search and Filters Bar */}
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
@@ -194,7 +202,7 @@ export function FacultyProjectsPage() {
                       <ExternalLink size={13} />
                     </Link>
                     <Link
-                      to={`/faculty/projects/${project.id}`}
+                      to={`/university/faculty/projects/${project.id}`}
                       className="inline-flex items-center justify-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                     >
                       Summary
@@ -226,7 +234,7 @@ export function FacultyProjectsPage() {
             />
           )}
         </div>
-      </WorkspacePage>
-    </FacultyStudentLayout>
+      </PageContainer>
+    </HEILayout>
   )
 }

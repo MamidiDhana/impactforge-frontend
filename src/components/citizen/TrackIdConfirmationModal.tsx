@@ -22,7 +22,7 @@ export function TrackIdConfirmationModal({ problem, onClose, translations }: Tra
 
   const handleTrackProblem = () => {
     if (onClose) onClose()
-    navigate(`/citizen/track/${problem.trackId || ''}`)
+    navigate(`/citizen/problems/${problem.id || problem.trackId || ''}`)
   }
 
   const t = translations

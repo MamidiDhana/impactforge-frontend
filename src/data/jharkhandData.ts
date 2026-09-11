@@ -694,7 +694,7 @@ export const REPORT_PROBLEM_TRANSLATIONS: Record<JharkhandLanguage, ReportProble
     consentError: 'Consent is required',
 
     cancelButton: 'Cancel',
-    viewReportsButton: 'View Reports',
+    viewReportsButton: 'Track Problem',
     submitButton: 'Report Problem',
     submittingButton: 'Registering...',
     reportingAsFooter: 'Reporting as',

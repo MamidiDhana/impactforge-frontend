@@ -45,7 +45,7 @@ export function PartnerLayout({ children, title, breadcrumbs, search }: PartnerL
       <div className="min-w-0 flex-1 flex flex-col">
         {/* Top Header */}
         <DashboardTopbar
-          portalName="Partner"
+          portalName="Industry Partnerships"
           title={title}
           breadcrumbs={breadcrumbs}
           user={currentUser}

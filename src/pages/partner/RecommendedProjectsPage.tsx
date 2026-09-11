@@ -102,7 +102,7 @@ export function RecommendedProjectsPage() {
         title="Matches"
         description="Browse validated university projects aligned with your organization's resources."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Matches' },
         ]}
       >

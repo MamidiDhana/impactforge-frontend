@@ -76,7 +76,7 @@ export function PartnerNotificationsPage() {
         title="Alerts"
         description="Stay updated with incoming collaboration requests and project updates."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Alerts' },
         ]}
         action={

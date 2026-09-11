@@ -123,7 +123,7 @@ export function CollaborationRequestsPage() {
         title="Requests"
         description="Review incoming support queries and track partnership offers."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Requests' },
         ]}
       >

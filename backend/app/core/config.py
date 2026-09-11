@@ -7,9 +7,27 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     PROJECT_NAME: str = "ImpactForge Backend"
     API_V1_STR: str = "/api"
+    SECRET_KEY: str = "impactforge-jwt-secret-key-production-jharkhand-2026"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
     # PostgreSQL Database URL
     DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/impactforge"
+
+    # AI Configuration (ImpactForge Phase 1 Part 1 & Part 2)
+    AI_PROVIDER: str = "gemini"
+    AI_API_KEY: Union[str, None] = None
+    AI_MODEL: str = "gemini-3.6-flash"
+    AI_FALLBACK_MODEL: str = "gemini-3.5-flash-lite"
+    AI_ENABLED: bool = True
+
+    # AI Embedding & Similarity Configuration (ImpactForge Phase 1 Part 3)
+    AI_EMBEDDING_MODEL: str = "BAAI/bge-small-en-v1.5"
+    AI_EMBEDDING_MULTILINGUAL_MODEL: str = "BAAI/bge-m3"
+    AI_EMBEDDING_ENABLED: bool = True
+    SIMILARITY_THRESHOLD_POSSIBLE: float = 0.55
+    SIMILARITY_THRESHOLD_STRONG: float = 0.75
+    SIMILARITY_THRESHOLD_DUPLICATE: float = 0.85
 
     # CORS configuration for frontend
     CORS_ORIGINS: Union[List[str], str] = [
@@ -52,7 +70,7 @@ class Settings(BaseSettings):
         raise ValueError(v)
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=("backend/.env", ".env"),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=True,

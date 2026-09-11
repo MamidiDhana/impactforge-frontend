@@ -9,10 +9,9 @@ import { SelectField } from '../../components/forms/SelectField'
 import { useAuth } from '../../context/AuthContext'
 
 const roles = [
-  { label: 'Citizen', value: 'citizen' },
+  { label: 'Citizen / Student', value: 'citizen' },
   { label: 'Government Validator', value: 'government' },
-  { label: 'University / HEI', value: 'hei' },
-  { label: 'Faculty', value: 'faculty' },
+  { label: 'University / HEI Admin', value: 'hei' },
   { label: 'Industry or MSME Partner', value: 'partner' },
   { label: 'Research Partner', value: 'partner' },
   { label: 'CSR Partner', value: 'partner' },
@@ -25,7 +24,7 @@ const registerSchema = z
     email: z.string().email('Enter a valid email address'),
     password: z.string().min(8, 'Password must contain at least 8 characters'),
     confirmPassword: z.string().min(1, 'Confirm your password'),
-    role: z.enum(['citizen', 'government', 'hei', 'faculty', 'partner', 'admin']),
+    role: z.enum(['citizen', 'government', 'hei', 'partner', 'admin']),
     organization: z.string().optional(),
     phone: z.string().optional(),
     terms: z.boolean().refine((value) => value, 'You must accept the terms and conditions'),

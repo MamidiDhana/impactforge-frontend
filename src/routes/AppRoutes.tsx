@@ -24,14 +24,12 @@ import { SubmitProblemPage } from '../pages/citizen/SubmitProblemPage'
 import { MyProblemsPage } from '../pages/citizen/MyProblemsPage'
 import { CitizenProblemDetailsPage } from '../pages/citizen/CitizenProblemDetailsPage'
 import { SimilarProblemsPage } from '../pages/citizen/SimilarProblemsPage'
-import { MyProjectsPage } from '../pages/citizen/MyProjectsPage'
 import { FeedbackPage } from '../pages/citizen/FeedbackPage'
 import { NotificationsPage } from '../pages/citizen/NotificationsPage'
 import { CitizenProfilePage } from '../pages/citizen/CitizenProfilePage'
 import { GovernmentDashboardPage } from '../pages/government/GovernmentDashboardPage'
 import { ProblemQueuePage } from '../pages/government/ProblemQueuePage'
 import { ProblemReviewPage } from '../pages/government/ProblemReviewPage'
-import { ValidationPage } from '../pages/government/ValidationPage'
 import { DuplicateAnalysisPage } from '../pages/government/DuplicateAnalysisPage'
 import { ValidatedProblemsPage } from '../pages/government/ValidatedProblemsPage'
 import { HEIMatchingPage } from '../pages/government/HEIMatchingPage'
@@ -45,7 +43,6 @@ import { HEIProfilePage } from '../pages/hei/HEIProfilePage'
 import { RecommendedProblemsPage } from '../pages/hei/RecommendedProblemsPage'
 import { HEIProblemDetailsPage } from '../pages/hei/HEIProblemDetailsPage'
 import { AcceptedChallengesPage } from '../pages/hei/AcceptedChallengesPage'
-import { FacultyPage } from '../pages/hei/FacultyPage'
 import { ResourcesPage } from '../pages/hei/ResourcesPage'
 import { CapabilityGapsPage } from '../pages/hei/CapabilityGapsPage'
 import { HEIProjectsPage } from '../pages/hei/HEIProjectsPage'
@@ -60,16 +57,8 @@ import { ActiveCollaborationsPage } from '../pages/partner/ActiveCollaborationsP
 import { SupportedProjectsPage } from '../pages/partner/SupportedProjectsPage'
 import { PartnerImpactPage } from '../pages/partner/PartnerImpactPage'
 import { PartnerNotificationsPage } from '../pages/partner/PartnerNotificationsPage'
-import { PartnerResourcesPage } from '../pages/partner/PartnerResourcesPage'
-import { PartnerSettingsPage } from '../pages/partner/PartnerSettingsPage'
 import { FacultyDashboardPage } from '../pages/faculty/FacultyDashboardPage'
-import { FacultyProfilePage } from '../pages/faculty/FacultyProfilePage'
-import { FacultyProjectsPage } from '../pages/faculty/FacultyProjectsPage'
-import { FacultyProjectDetailsPage } from '../pages/faculty/FacultyProjectDetailsPage'
-import { FacultyTeamsPage } from '../pages/faculty/FacultyTeamsPage'
 import { MilestonesPage } from '../pages/faculty/MilestonesPage'
-import { FacultyCapabilityGapsPage } from '../pages/faculty/FacultyCapabilityGapsPage'
-import { FacultyNotificationsPage } from '../pages/faculty/FacultyNotificationsPage'
 import { ProjectsPage } from '../pages/project/ProjectsPage'
 import { ProjectWorkspacePage } from '../pages/project/ProjectWorkspacePage'
 import { AdminDashboardPage } from '../pages/admin/AdminDashboardPage'
@@ -77,18 +66,26 @@ import { AdminUsersPage } from '../pages/admin/AdminUsersPage'
 import { AdminRolesPage } from '../pages/admin/AdminRolesPage'
 import { AdminOrganizationsPage } from '../pages/admin/AdminOrganizationsPage'
 import { AdminTaxonomyPage } from '../pages/admin/AdminTaxonomyPage'
-import { AdminAIModelsPage } from '../pages/admin/AdminAIModelsPage'
 import { AdminAuditLogsPage } from '../pages/admin/AdminAuditLogsPage'
 import { AdminSystemHealthPage } from '../pages/admin/AdminSystemHealthPage'
 import { AdminSettingsPage } from '../pages/admin/AdminSettingsPage'
 
-import { CitizenTrackProblemPage } from '../pages/citizen/CitizenTrackProblemPage'
 import { AdminHEIRegistryPage } from '../pages/admin/AdminHEIRegistryPage'
 import { AdminPartnerRegistryPage } from '../pages/admin/AdminPartnerRegistryPage'
+import { AnalyticsDashboardPage } from '../pages/analytics/AnalyticsDashboardPage'
+import { AIOverviewPage } from '../pages/admin/ai/AIOverviewPage'
+import { AIPredictionsPage } from '../pages/admin/ai/AIPredictionsPage'
+import { TrainingDatasetPage } from '../pages/admin/ai/TrainingDatasetPage'
+import { RetrainingJobsPage } from '../pages/admin/ai/RetrainingJobsPage'
+import { AISettingsPage } from '../pages/admin/ai/AISettingsPage'
+import { AdminProblemsPage } from '../pages/admin/AdminProblemsPage'
 
 function AuthOnlyRoute({ children }: { children: ReactNode }) { const { isAuthenticated, isInitialized, currentUser } = useAuth(); if (!isInitialized) return <LoadingState rows={1} />; return isAuthenticated && currentUser ? <Navigate to={ROLE_DASHBOARD_PATH[currentUser.role]} replace /> : <>{children}</> }
 function roleRoute(role: UserRole, children: ReactNode) { return <ProtectedRoute><RoleRoute allowedRoles={[role]}>{children}</RoleRoute></ProtectedRoute> }
+function multiRoleRoute(roles: UserRole[], children: ReactNode) { return <ProtectedRoute><RoleRoute allowedRoles={roles}>{children}</RoleRoute></ProtectedRoute> }
 function ProjectIndexRedirect() { const { id } = useParams(); return <Navigate to={`/projects/${id}/overview`} replace /> }
+function FacultyTeamParamRedirect() { return <Navigate to="/university/faculty" replace /> }
+function FacultyProjectParamRedirect() { return <Navigate to="/university/faculty" replace /> }
 
 function ProfileRedirect() {
   const { currentUser } = useAuth()
@@ -97,7 +94,7 @@ function ProfileRedirect() {
     citizen: '/citizen/profile',
     government: '/government/profile',
     hei: '/hei/profile',
-    faculty: '/faculty/profile',
+    faculty: '/university/faculty',
     partner: '/partner/profile',
     admin: '/admin/settings',
   }
@@ -111,7 +108,7 @@ function NotificationsRedirect() {
     citizen: '/citizen/notifications',
     government: '/government/notifications',
     hei: '/hei/notifications',
-    faculty: '/faculty/notifications',
+    faculty: '/hei/notifications',
     partner: '/partner/notifications',
     admin: '/admin/audit-logs',
   }
@@ -124,12 +121,13 @@ export function AppRoutes() { return <Routes>
   <Route path="/citizen/dashboard" element={roleRoute('citizen', <CitizenDashboardPage />)} />
   <Route path="/citizen/submit-problem" element={roleRoute('citizen', <SubmitProblemPage />)} />
   <Route path="/citizen/report-problem" element={roleRoute('citizen', <SubmitProblemPage />)} />
-  <Route path="/citizen/track" element={roleRoute('citizen', <CitizenTrackProblemPage />)} />
-  <Route path="/citizen/track/:trackId" element={roleRoute('citizen', <CitizenTrackProblemPage />)} />
+  <Route path="/citizen/report" element={roleRoute('citizen', <SubmitProblemPage />)} />
+  <Route path="/citizen/track" element={<Navigate to="/citizen/problems" replace />} />
+  <Route path="/citizen/track/:trackId" element={<Navigate to="/citizen/problems" replace />} />
   <Route path="/citizen/problems" element={roleRoute('citizen', <MyProblemsPage />)} />
   <Route path="/citizen/problems/:id" element={roleRoute('citizen', <CitizenProblemDetailsPage />)} />
   <Route path="/citizen/problems/:id/similar" element={roleRoute('citizen', <SimilarProblemsPage />)} />
-  <Route path="/citizen/projects" element={roleRoute('citizen', <MyProjectsPage />)} />
+  <Route path="/citizen/projects" element={<Navigate to="/citizen/dashboard" replace />} />
   <Route path="/citizen/feedback" element={roleRoute('citizen', <FeedbackPage />)} />
   <Route path="/citizen/notifications" element={roleRoute('citizen', <NotificationsPage />)} />
   <Route path="/citizen/profile" element={roleRoute('citizen', <CitizenProfilePage />)} />
@@ -137,11 +135,12 @@ export function AppRoutes() { return <Routes>
   <Route path="/government/dashboard" element={roleRoute('government', <GovernmentDashboardPage />)} />
   <Route path="/government/problem-queue" element={roleRoute('government', <ProblemQueuePage />)} />
   <Route path="/government/problems/:id/review" element={roleRoute('government', <ProblemReviewPage />)} />
-  <Route path="/government/validation" element={roleRoute('government', <ValidationPage />)} />
+  <Route path="/government/validation" element={<Navigate to="/government/problem-queue" replace />} />
   <Route path="/government/duplicate-analysis" element={roleRoute('government', <DuplicateAnalysisPage />)} />
   <Route path="/government/validated-problems" element={roleRoute('government', <ValidatedProblemsPage />)} />
   <Route path="/government/hei-matching" element={roleRoute('government', <HEIMatchingPage />)} />
   <Route path="/government/projects" element={roleRoute('government', <GovernmentProjectsPage />)} />
+  <Route path="/government/projects/:id" element={roleRoute('government', <GovernmentProjectsPage />)} />
   <Route path="/government/analytics" element={roleRoute('government', <GovernmentAnalyticsPage />)} />
   <Route path="/government/audit-logs" element={roleRoute('government', <AuditLogsPage />)} />
   <Route path="/government/users" element={<Navigate to="/government/dashboard" replace />} />
@@ -149,25 +148,91 @@ export function AppRoutes() { return <Routes>
   <Route path="/government/notifications" element={roleRoute('government', <GovernmentNotificationsPage />)} />
   <Route path="/government/profile" element={roleRoute('government', <GovernmentProfilePage />)} />
   <Route path="/government/settings" element={<Navigate to="/government/dashboard" replace />} />
-  <Route path="/hei/dashboard" element={roleRoute('hei', <HEIDashboardPage />)} /><Route path="/hei/profile" element={roleRoute('hei', <HEIProfilePage />)} /><Route path="/hei/recommended-problems" element={roleRoute('hei', <RecommendedProblemsPage />)} /><Route path="/hei/problems/:id" element={roleRoute('hei', <HEIProblemDetailsPage />)} /><Route path="/hei/accepted-challenges" element={roleRoute('hei', <AcceptedChallengesPage />)} /><Route path="/hei/faculty" element={roleRoute('hei', <FacultyPage />)} /><Route path="/hei/resources" element={roleRoute('hei', <ResourcesPage />)} /><Route path="/hei/teams" element={<Navigate to="/hei/dashboard" replace />} /><Route path="/hei/capability-gaps" element={roleRoute('hei', <CapabilityGapsPage />)} /><Route path="/hei/progress" element={roleRoute('hei', <CapabilityGapsPage />)} /><Route path="/hei/projects" element={roleRoute('hei', <HEIProjectsPage />)} /><Route path="/hei/collaboration-requests" element={roleRoute('hei', <CollaborationRequestsPage />)} /><Route path="/hei/notifications" element={roleRoute('hei', <HEINotificationsPage />)} /><Route path="/hei/settings" element={<Navigate to="/hei/dashboard" replace />} />
-  <Route path="/partner/dashboard" element={roleRoute('partner', <PartnerDashboardPage />)} /><Route path="/partner/profile" element={roleRoute('partner', <PartnerProfilePage />)} /><Route path="/partner/recommended-projects" element={roleRoute('partner', <RecommendedProjectsPage />)} /><Route path="/partner/project-details" element={roleRoute('partner', <PartnerProjectDetailsPage />)} /><Route path="/partner/project-details/:id" element={roleRoute('partner', <PartnerProjectDetailsPage />)} /><Route path="/partner/projects/:id" element={roleRoute('partner', <PartnerProjectDetailsPage />)} /><Route path="/partner/collaboration-requests" element={roleRoute('partner', <PartnerCollaborationRequestsPage />)} /><Route path="/partner/active-collaborations" element={roleRoute('partner', <ActiveCollaborationsPage />)} /><Route path="/partner/supported-projects" element={roleRoute('partner', <SupportedProjectsPage />)} /><Route path="/partner/resources" element={roleRoute('partner', <PartnerResourcesPage />)} /><Route path="/partner/impact" element={roleRoute('partner', <PartnerImpactPage />)} /><Route path="/partner/notifications" element={roleRoute('partner', <PartnerNotificationsPage />)} /><Route path="/partner/settings" element={roleRoute('partner', <PartnerSettingsPage />)} />
-  <Route path="/faculty/dashboard" element={roleRoute('faculty', <FacultyDashboardPage />)} /><Route path="/faculty/profile" element={roleRoute('faculty', <FacultyProfilePage />)} /><Route path="/faculty/projects" element={roleRoute('faculty', <FacultyProjectsPage />)} /><Route path="/faculty/projects/:id" element={roleRoute('faculty', <FacultyProjectDetailsPage />)} /><Route path="/faculty/guidance" element={roleRoute('faculty', <FacultyProjectsPage />)} /><Route path="/faculty/teams" element={roleRoute('faculty', <FacultyTeamsPage />)} /><Route path="/faculty/milestones" element={roleRoute('faculty', <MilestonesPage />)} /><Route path="/faculty/capability-gaps" element={roleRoute('faculty', <FacultyCapabilityGapsPage />)} /><Route path="/faculty/resources" element={roleRoute('faculty', <FacultyCapabilityGapsPage />)} /><Route path="/faculty/reports" element={roleRoute('faculty', <MilestonesPage />)} /><Route path="/faculty/notifications" element={roleRoute('faculty', <FacultyNotificationsPage />)} /><Route path="/faculty/settings" element={<Navigate to="/faculty/dashboard" replace />} />
+  {/* University Portal Routes */}
+  <Route path="/university" element={multiRoleRoute(['hei', 'faculty', 'admin'], <HEIDashboardPage />)} />
+  <Route path="/university/dashboard" element={<Navigate to="/university" replace />} />
+  <Route path="/university/students" element={<Navigate to="/university" replace />} />
+  <Route path="/university/faculty" element={multiRoleRoute(['faculty', 'hei', 'admin'], <FacultyDashboardPage />)} />
+  <Route path="/university/faculty/students" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/university/faculty/teams" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/university/faculty/teams/:teamId" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/university/faculty/projects" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/university/faculty/projects/:id" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/university/faculty/reviews" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/university/faculty/problems" element={<Navigate to="/university/problems" replace />} />
+  <Route path="/university/faculty/reports" element={multiRoleRoute(['faculty', 'hei', 'admin'], <MilestonesPage />)} />
+  <Route path="/university/problems" element={multiRoleRoute(['hei', 'faculty', 'admin'], <AcceptedChallengesPage />)} />
+  <Route path="/university/reports" element={multiRoleRoute(['hei', 'faculty', 'admin'], <CapabilityGapsPage />)} />
+
+  {/* HEI Portal Compatibility and Redirects */}
+  <Route path="/hei" element={<Navigate to="/university" replace />} />
+  <Route path="/hei/dashboard" element={<Navigate to="/university" replace />} />
+  <Route path="/hei/teams" element={<Navigate to="/university/faculty/teams" replace />} />
+  <Route path="/hei/faculty" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/hei/profile" element={roleRoute('hei', <HEIProfilePage />)} />
+  <Route path="/hei/recommended-problems" element={roleRoute('hei', <RecommendedProblemsPage />)} />
+  <Route path="/hei/problems/:id" element={roleRoute('hei', <HEIProblemDetailsPage />)} />
+  <Route path="/hei/accepted-challenges" element={roleRoute('hei', <AcceptedChallengesPage />)} />
+  <Route path="/hei/resources" element={roleRoute('hei', <ResourcesPage />)} />
+  <Route path="/hei/capability-gaps" element={roleRoute('hei', <CapabilityGapsPage />)} />
+  <Route path="/hei/progress" element={roleRoute('hei', <CapabilityGapsPage />)} />
+  <Route path="/hei/projects" element={roleRoute('hei', <HEIProjectsPage />)} />
+  <Route path="/hei/collaboration-requests" element={roleRoute('hei', <CollaborationRequestsPage />)} />
+  <Route path="/hei/notifications" element={roleRoute('hei', <HEINotificationsPage />)} />
+  <Route path="/hei/settings" element={<Navigate to="/university" replace />} />
+
+  <Route path="/partner/dashboard" element={roleRoute('partner', <PartnerDashboardPage />)} /><Route path="/partner/profile" element={roleRoute('partner', <PartnerProfilePage />)} /><Route path="/partner/recommended-projects" element={roleRoute('partner', <RecommendedProjectsPage />)} /><Route path="/partner/project-details" element={roleRoute('partner', <PartnerProjectDetailsPage />)} /><Route path="/partner/project-details/:id" element={roleRoute('partner', <PartnerProjectDetailsPage />)} /><Route path="/partner/projects/:id" element={roleRoute('partner', <PartnerProjectDetailsPage />)} /><Route path="/partner/collaboration-requests" element={roleRoute('partner', <PartnerCollaborationRequestsPage />)} /><Route path="/partner/active-collaborations" element={roleRoute('partner', <ActiveCollaborationsPage />)} /><Route path="/partner/supported-projects" element={roleRoute('partner', <SupportedProjectsPage />)} /><Route path="/partner/resources" element={<Navigate to="/partner/dashboard" replace />} /><Route path="/partner/impact" element={roleRoute('partner', <PartnerImpactPage />)} /><Route path="/partner/notifications" element={roleRoute('partner', <PartnerNotificationsPage />)} /><Route path="/partner/settings" element={<Navigate to="/partner/dashboard" replace />} />
+
+  {/* Standalone Faculty Portal Redirects */}
+  <Route path="/faculty" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/faculty/dashboard" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/faculty/teams" element={<Navigate to="/university/faculty/teams" replace />} />
+  <Route path="/faculty/teams/:teamId" element={<FacultyTeamParamRedirect />} />
+  <Route path="/faculty/projects" element={<Navigate to="/university/faculty/projects" replace />} />
+  <Route path="/faculty/projects/:id" element={<FacultyProjectParamRedirect />} />
+  <Route path="/faculty/students" element={<Navigate to="/university/faculty/students" replace />} />
+  <Route path="/faculty/reviews" element={<Navigate to="/university/faculty/reviews" replace />} />
+  <Route path="/faculty/reports" element={<Navigate to="/university/faculty/reports" replace />} />
+  <Route path="/faculty/milestones" element={<Navigate to="/university/faculty/reports" replace />} />
+  <Route path="/faculty/capability-gaps" element={<Navigate to="/university/faculty/projects" replace />} />
+  <Route path="/faculty/guidance" element={<Navigate to="/university/faculty/projects" replace />} />
+  <Route path="/faculty/resources" element={<Navigate to="/university/faculty/projects" replace />} />
+  <Route path="/faculty/profile" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/faculty/notifications" element={<Navigate to="/hei/notifications" replace />} />
+  <Route path="/faculty/settings" element={<Navigate to="/university/faculty" replace />} />
+  <Route path="/faculty/*" element={<Navigate to="/university/faculty" replace />} />
   <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} /><Route path="/projects/:id" element={<ProtectedRoute><ProjectIndexRedirect /></ProtectedRoute>} /><Route path="/projects/:id/overview" element={<ProtectedRoute><ProjectWorkspacePage section="overview" /></ProtectedRoute>} /><Route path="/projects/:id/team" element={<ProtectedRoute><ProjectWorkspacePage section="team" /></ProtectedRoute>} /><Route path="/projects/:id/milestones" element={<ProtectedRoute><ProjectWorkspacePage section="milestones" /></ProtectedRoute>} /><Route path="/projects/:id/tasks" element={<ProtectedRoute><ProjectWorkspacePage section="tasks" /></ProtectedRoute>} /><Route path="/projects/:id/documents" element={<ProtectedRoute><ProjectWorkspacePage section="documents" /></ProtectedRoute>} /><Route path="/projects/:id/discussions" element={<ProtectedRoute><ProjectWorkspacePage section="discussions" /></ProtectedRoute>} /><Route path="/projects/:id/capability-gaps" element={<ProtectedRoute><ProjectWorkspacePage section="capability-gaps" /></ProtectedRoute>} /><Route path="/projects/:id/partners" element={<ProtectedRoute><ProjectWorkspacePage section="partners" /></ProtectedRoute>} /><Route path="/projects/:id/feedback" element={<ProtectedRoute><ProjectWorkspacePage section="feedback" /></ProtectedRoute>} /><Route path="/projects/:id/impact" element={<ProtectedRoute><ProjectWorkspacePage section="impact" /></ProtectedRoute>} />
   <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
   <Route path="/admin/dashboard" element={roleRoute('admin', <AdminDashboardPage />)} />
   <Route path="/admin/users" element={roleRoute('admin', <AdminUsersPage />)} />
   <Route path="/admin/roles" element={roleRoute('admin', <AdminRolesPage />)} />
   <Route path="/admin/organizations" element={roleRoute('admin', <AdminOrganizationsPage />)} />
+  <Route path="/admin/universities" element={roleRoute('admin', <AdminHEIRegistryPage />)} />
   <Route path="/admin/hei-registry" element={roleRoute('admin', <AdminHEIRegistryPage />)} />
   <Route path="/admin/partner-registry" element={roleRoute('admin', <AdminPartnerRegistryPage />)} />
+  <Route path="/admin/problems" element={roleRoute('admin', <AdminProblemsPage />)} />
+  <Route path="/admin/student-teams" element={<Navigate to="/admin/dashboard" replace />} />
+  <Route path="/admin/teams" element={<Navigate to="/admin/dashboard" replace />} />
   <Route path="/admin/taxonomy" element={roleRoute('admin', <AdminTaxonomyPage />)} />
-  <Route path="/admin/ai-models" element={roleRoute('admin', <AdminAIModelsPage />)} />
+  <Route path="/admin/reports" element={<Navigate to="/admin/dashboard" replace />} />
+
+  {/* Super Admin AI Management Feature Routes */}
+  <Route path="/admin/ai" element={<Navigate to="/admin/ai/overview" replace />} />
+  <Route path="/admin/ai/overview" element={roleRoute('admin', <AIOverviewPage />)} />
+  <Route path="/admin/ai/predictions" element={roleRoute('admin', <AIPredictionsPage />)} />
+  <Route path="/admin/ai/feedback" element={<Navigate to="/admin/ai/overview" replace />} />
+  <Route path="/admin/ai/dataset" element={roleRoute('admin', <TrainingDatasetPage />)} />
+  <Route path="/admin/ai/retraining" element={roleRoute('admin', <RetrainingJobsPage />)} />
+  <Route path="/admin/ai/settings" element={roleRoute('admin', <AISettingsPage />)} />
+  <Route path="/admin/ai-models" element={<Navigate to="/admin/ai/overview" replace />} />
+
   <Route path="/admin/audit-logs" element={roleRoute('admin', <AdminAuditLogsPage />)} />
   <Route path="/admin/system-health" element={roleRoute('admin', <AdminSystemHealthPage />)} />
   <Route path="/admin/settings" element={roleRoute('admin', <AdminSettingsPage />)} />
   <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
-  <Route path="/student" element={<Navigate to="/faculty/dashboard" replace />} />
-  <Route path="/student/*" element={<Navigate to="/faculty/dashboard" replace />} />
+  <Route path="/analytics/dashboard" element={<ProtectedRoute><RoleRoute allowedRoles={['admin', 'government']}><AnalyticsDashboardPage /></RoleRoute></ProtectedRoute>} />
+  <Route path="/student" element={<Navigate to="/unauthorized" replace />} />
+  <Route path="/student/*" element={<Navigate to="/unauthorized" replace />} />
   <Route path="/profile" element={<ProtectedRoute><ProfileRedirect /></ProtectedRoute>} />
   <Route path="/notifications" element={<ProtectedRoute><NotificationsRedirect /></ProtectedRoute>} />
   <Route path="/unauthorized" element={<UnauthorizedPage />} />

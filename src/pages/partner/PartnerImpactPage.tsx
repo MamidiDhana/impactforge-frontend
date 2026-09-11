@@ -9,7 +9,6 @@ import {
   Download,
   GraduationCap,
   Plus,
-  Quote,
   Timer,
   Users,
   X,
@@ -22,7 +21,6 @@ import {
   partnerImpactOverview,
   categoryContributionBreakdown,
   monthlyContributionActivity,
-  beneficiaryTestimonials,
   partnerImpact as initialImpactRecords,
 } from '../../data/partnerImpact'
 import type { PartnerImpactRecord } from '../../types'
@@ -31,7 +29,6 @@ export function PartnerImpactPage() {
   const [impactRecords, setImpactRecords] = useState<PartnerImpactRecord[]>(initialImpactRecords)
   const [modalOpen, setModalOpen] = useState(false)
   const [feedbackNotice, setFeedbackNotice] = useState<string | null>(null)
-  const [hoveredMonth, setHoveredMonth] = useState<string | null>(null)
 
   // Form State for Submit Impact Update
   const [formProject, setFormProject] = useState('')
@@ -71,7 +68,7 @@ export function PartnerImpactPage() {
         title="Impact"
         description="Quantify the social, technical, and geographic return of your organization's contributions."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Impact' },
         ]}
         action={
@@ -210,83 +207,6 @@ export function PartnerImpactPage() {
             </div>
           </section>
 
-          {/* Monthly Contribution Activity & Simple Chart */}
-          <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <div>
-                <h3 className="font-[Manrope] text-base font-bold text-[#13243b]">
-                  Monthly Contribution & Impact Growth Chart
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Visual distribution of engineering hours and disbursements across 2026.
-                </p>
-              </div>
-              <span className="text-xs font-bold text-[#187e8d] bg-[#e8f5f5] px-3 py-1 rounded-full">
-                2026 Fiscal Year
-              </span>
-            </div>
-
-            {/* Interactive SVG Bar Chart Component */}
-            <div className="mt-6 rounded-xl border border-slate-100 bg-slate-50/70 p-5">
-              <div className="flex items-end justify-between gap-2 h-44 pt-6">
-                {monthlyContributionActivity.map((m) => {
-                  const maxHours = 90
-                  const heightPercent = Math.round((m.hours / maxHours) * 100)
-                  const isHovered = hoveredMonth === m.month
-
-                  return (
-                    <div
-                      key={m.month}
-                      onMouseEnter={() => setHoveredMonth(m.month)}
-                      onMouseLeave={() => setHoveredMonth(null)}
-                      className="flex-1 flex flex-col items-center justify-end h-full group cursor-pointer"
-                    >
-                      {/* Tooltip on hover */}
-                      <div
-                        className={`mb-2 transition-all duration-200 text-center ${
-                          isHovered ? 'opacity-100 -translate-y-1' : 'opacity-0 translate-y-1'
-                        }`}
-                      >
-                        <span className="rounded bg-[#12365a] px-2 py-1 text-[10px] font-bold text-white shadow-md whitespace-nowrap">
-                          {m.hours} hrs · ₹{(m.funding / 100000).toFixed(1)}L
-                        </span>
-                      </div>
-
-                      {/* Bar with gradient */}
-                      <div className="w-full max-w-[36px] bg-slate-200 rounded-t-lg overflow-hidden flex items-end">
-                        <div
-                          className={`w-full rounded-t-lg transition-all duration-300 ${
-                            isHovered ? 'bg-[#12365a]' : 'bg-[#187e8d]'
-                          }`}
-                          style={{ height: `${heightPercent}%` }}
-                        />
-                      </div>
-
-                      {/* Month Label */}
-                      <span
-                        className={`mt-2 text-[11px] font-bold ${
-                          isHovered ? 'text-[#12365a]' : 'text-slate-500'
-                        }`}
-                      >
-                        {m.month.slice(0, 3)}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-6 border-t border-slate-200/60 pt-3 text-xs text-slate-600">
-                <div className="flex items-center gap-2">
-                  <span className="size-3 rounded-xs bg-[#187e8d]" />
-                  <span>Technical Mentorship Hours (Max 90 hrs/mo)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="size-3 rounded-xs bg-[#12365a]" />
-                  <span>Active Sprint Hover Focus</span>
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* Category-wise Breakdown and Monthly Activity Table */}
           <div className="grid gap-6 lg:grid-cols-2">
@@ -385,37 +305,6 @@ export function PartnerImpactPage() {
             </div>
           </div>
 
-          {/* Beneficiary & Academic Feedback */}
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="font-[Manrope] text-base font-bold text-[#13243b]">
-                  Beneficiary & Academic Partner Feedback
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Quotes from faculty leads, community representatives, and school heads
-                </p>
-              </div>
-              <Quote size={24} className="text-[#187e8d] opacity-40" />
-            </div>
-
-            <div className="mt-5 grid gap-4 md:grid-cols-3">
-              {beneficiaryTestimonials.map((t) => (
-                <div key={t.id} className="flex flex-col justify-between rounded-xl border border-slate-100 bg-slate-50 p-4 text-xs">
-                  <p className="italic text-slate-700 leading-relaxed">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <div className="mt-4 border-t border-slate-200/60 pt-3">
-                    <p className="font-bold text-slate-900">{t.author}</p>
-                    <p className="text-[11px] text-slate-500">{t.role}</p>
-                    <p className="mt-1 text-[10px] font-semibold text-[#187e8d]">
-                      {t.project}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Submit Impact Update Modal */}

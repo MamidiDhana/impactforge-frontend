@@ -34,10 +34,10 @@ export function PartnerPage({
   action,
 }: PartnerPageProps) {
   const finalBreadcrumbs =
-    title === 'Partner'
+    title === 'Industry Partnerships' || title === 'Partner'
       ? undefined
-      : (breadcrumbs?.map((b) => (b.label === 'Dashboard' ? { ...b, label: 'Partner' } : b)) ?? [
-          { label: 'Partner', href: '/partner/dashboard' },
+      : (breadcrumbs?.map((b) => (b.label === 'Dashboard' || b.label === 'Partner' ? { ...b, label: 'Industry Partnerships' } : b)) ?? [
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: title },
         ])
 

@@ -1,21 +1,57 @@
 import { useState, type ReactNode } from 'react'
-import { Bell, ClipboardList, FileSearch, FolderKanban, GraduationCap, LayoutDashboard, Network, Package } from 'lucide-react'
+import {
+  ClipboardList,
+  FileSearch,
+  FileText,
+  LayoutDashboard,
+  Users,
+} from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { DashboardSidebar } from '../components/navigation/DashboardSidebar'
+import { DashboardSidebar, type NavigationItem } from '../components/navigation/DashboardSidebar'
 import { DashboardTopbar } from '../components/navigation/DashboardTopbar'
 import { useAuth } from '../context/AuthContext'
-interface HEILayoutProps { children: ReactNode; title: string; breadcrumbs?: { label: string; href?: string }[] }
-const items = [
-  { label: 'University', href: '/hei/dashboard', icon: LayoutDashboard },
-  { label: 'Problems', href: '/hei/accepted-challenges', icon: FileSearch },
-  { label: 'Recommendations', href: '/hei/recommended-problems', icon: ClipboardList },
-  { label: 'Requests', href: '/hei/collaboration-requests', icon: Network },
-  { label: 'Projects', href: '/hei/projects', icon: FolderKanban },
-  { label: 'Faculty', href: '/hei/faculty', icon: GraduationCap },
-  { label: 'Resources', href: '/hei/resources', icon: Package },
-  { label: 'Progress', href: '/hei/capability-gaps', icon: ClipboardList },
-  { label: 'Alerts', href: '/hei/notifications', icon: Bell },
+
+interface HEILayoutProps {
+  children: ReactNode
+  title: string
+  breadcrumbs?: { label: string; href?: string }[]
+}
+
+const items: NavigationItem[] = [
+  {
+    label: 'Dashboard',
+    href: '/university',
+    icon: LayoutDashboard,
+  },
+  {
+    label: 'Faculty',
+    href: '/university/faculty',
+    icon: Users,
+    children: [
+      {
+        label: 'Faculty Dashboard',
+        href: '/university/faculty',
+        icon: LayoutDashboard,
+      },
+      {
+        label: 'Problems',
+        href: '/university/problems',
+        icon: FileSearch,
+      },
+      {
+        label: 'Reports',
+        href: '/university/faculty/reports',
+        icon: FileText,
+      },
+    ],
+  },
+  {
+    label: 'Capability & Resources',
+    href: '/university/reports',
+    icon: ClipboardList,
+  },
 ]
+
 export function HEILayout({ children, title, breadcrumbs }: HEILayoutProps) {
   const { currentUser, logout } = useAuth()
   const navigate = useNavigate()
@@ -42,7 +78,7 @@ export function HEILayout({ children, title, breadcrumbs }: HEILayoutProps) {
       />
       <div className="min-w-0 flex-1">
         <DashboardTopbar
-          portalName="University"
+          portalName="University Portal"
           title={title}
           breadcrumbs={breadcrumbs}
           user={currentUser}
@@ -57,3 +93,5 @@ export function HEILayout({ children, title, breadcrumbs }: HEILayoutProps) {
     </div>
   )
 }
+
+export const UniversityLayout = HEILayout

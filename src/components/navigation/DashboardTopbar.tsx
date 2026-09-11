@@ -1,6 +1,6 @@
 import { Menu } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { NotificationBell } from './NotificationBell'
+import { NotificationBell } from '../notifications/NotificationBell'
 import { UserMenu } from './UserMenu'
 import type { BreadcrumbItem } from '../common/Breadcrumbs'
 import type { User } from '../../types'
@@ -23,9 +23,8 @@ function getDerivedPortalName(): string | undefined {
   const path = window.location.pathname
   if (path.startsWith('/citizen')) return 'Citizen'
   if (path.startsWith('/government')) return 'Government'
-  if (path.startsWith('/hei')) return 'University'
-  if (path.startsWith('/faculty')) return 'Faculty'
-  if (path.startsWith('/partner')) return 'Partner'
+  if (path.startsWith('/hei') || path.startsWith('/university') || path.startsWith('/faculty')) return 'University Portal'
+  if (path.startsWith('/partner')) return 'Industry Partnerships'
   if (path.startsWith('/admin')) return 'Super Admin'
   return undefined
 }
@@ -36,8 +35,8 @@ export function DashboardTopbar({
   breadcrumbs: _breadcrumbs,
   user,
   onMenuClick,
-  onNotificationsClick,
-  notificationCount,
+  onNotificationsClick: _onNotificationsClick,
+  notificationCount: _notificationCount,
   onProfile,
   onLogout,
   search,
@@ -68,7 +67,7 @@ export function DashboardTopbar({
       <div className="flex items-center gap-2.5">
         {search && <div className="hidden w-52 md:block">{search}</div>}
         {actions && <div className="flex items-center gap-2">{actions}</div>}
-        <NotificationBell count={notificationCount} onClick={onNotificationsClick} />
+        <NotificationBell />
         {user && <UserMenu user={user} onProfile={onProfile} onLogout={onLogout} />}
       </div>
     </header>

@@ -7,8 +7,6 @@ import {
   Building2,
   Calendar,
   CheckCircle2,
-  Download,
-  FileText,
   GraduationCap,
   Handshake,
   HeartHandshake,
@@ -87,7 +85,7 @@ export function PartnerProjectDetailsPage() {
         title={project.title}
         description="Comprehensive project overview, problem context, academic leads, and resource gaps."
         breadcrumbs={[
-          { label: 'Partner', href: '/partner/dashboard' },
+          { label: 'Industry Partnerships', href: '/partner/dashboard' },
           { label: 'Matches', href: '/partner/recommended-projects' },
           { label: 'Project Details' },
         ]}
@@ -324,42 +322,6 @@ export function PartnerProjectDetailsPage() {
                     </div>
                   </div>
                 )}
-              </div>
-
-              {/* Project Documents */}
-              <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 className="font-[Manrope] text-base font-bold text-[#13243b]">
-                  Project Documents & Specifications
-                </h3>
-                <div className="mt-4 divide-y divide-slate-100">
-                  {(project.documents ?? [
-                    { name: 'Technical_Requirements_Spec_v1.0.pdf', size: '2.1 MB', type: 'PDF' },
-                    { name: 'Budget_BOM_Breakdown.xlsx', size: '480 KB', type: 'Spreadsheet' },
-                  ]).map((doc) => (
-                    <div key={doc.name} className="flex items-center justify-between py-3">
-                      <div className="flex items-center gap-3">
-                        <span className="grid size-9 place-items-center rounded-lg bg-slate-100 text-slate-600">
-                          <FileText size={18} />
-                        </span>
-                        <div>
-                          <p className="text-sm font-semibold text-slate-800">{doc.name}</p>
-                          <p className="text-xs text-slate-400">{doc.size} · {doc.type}</p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFeedback(`Demo file "${doc.name}" download initiated in mock session.`)
-                          setTimeout(() => setFeedback(null), 3500)
-                        }}
-                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                      >
-                        <Download size={13} />
-                        Download
-                      </button>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
 

@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Clock3, Compass, Info, MapPin } from 'lucide-react'
+import { CheckCircle2, Clock3, Info, MapPin } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { CitizenLayout } from '../../layouts/CitizenLayout'
 import { PageContainer } from '../../components/common/PageContainer'
@@ -7,8 +7,6 @@ import { CitizenStatusBadge } from '../../components/citizen/CitizenStatusBadge'
 import { ResponsiveCard } from '../../components/common/ResponsiveCard'
 import { EmptyState } from '../../components/common/EmptyState'
 import { JharkhandMapPreview } from '../../components/citizen/JharkhandMapPreview'
-import { ProjectCard } from '../../components/projects/ProjectCard'
-import { citizenProjects } from '../../data/citizenProjects'
 import { useProblems } from '../../context/ProblemContext'
 
 export function CitizenProblemDetailsPage() {
@@ -32,7 +30,7 @@ export function CitizenProblemDetailsPage() {
                 to="/citizen/problems"
                 className="rounded-lg bg-[#12365a] px-4 py-2 text-sm font-semibold text-white"
               >
-                Back to Reports
+                Back to Track Problem
               </Link>
             }
           />
@@ -41,7 +39,6 @@ export function CitizenProblemDetailsPage() {
     )
   }
 
-  const project = citizenProjects.find((item) => item.problemTitle === problem.title)
   const timeline = problem.timelineStages || []
 
   return (
@@ -52,7 +49,7 @@ export function CitizenProblemDetailsPage() {
           description="Your reported problem, Jharkhand geo-location, and current governance review context."
           breadcrumbs={[
             { label: 'Citizen', href: '/citizen/dashboard' },
-            { label: 'Reports', href: '/citizen/problems' },
+            { label: 'Track Problem', href: '/citizen/problems' },
             { label: problem.trackId || 'Details' },
           ]}
           action={
@@ -100,13 +97,6 @@ export function CitizenProblemDetailsPage() {
                 <h2 className="font-[Manrope] text-lg font-bold text-[#13243b]">
                   Tracking Summary
                 </h2>
-                <Link
-                  to={`/citizen/track/${problem.trackId}`}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-[#187e8d] hover:underline"
-                >
-                  <Compass size={13} />
-                  <span>Open Full 15-Stage Tracker</span>
-                </Link>
               </div>
 
               <ol className="mt-5 space-y-4">
@@ -178,33 +168,14 @@ export function CitizenProblemDetailsPage() {
 
             <div className="flex flex-wrap gap-2">
               <Link
-                to={`/citizen/track/${problem.trackId}`}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[#12365a] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#1a4a7a]"
+                to="/citizen/problems"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#12365a] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#1a4a7a]"
               >
-                <Compass size={14} />
-                <span>Track Problem Progress</span>
+                <span>Back to Track Problem</span>
               </Link>
-              {project && (
-                <Link
-                  to="/citizen/projects"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#187e8d] px-4 py-2.5 text-xs font-bold text-white hover:bg-[#156976]"
-                >
-                  <span>View Project</span>
-                  <ArrowRight size={14} />
-                </Link>
-              )}
             </div>
           </aside>
         </div>
-
-        {project && (
-          <section className="mt-8">
-            <h2 className="mb-4 font-[Manrope] text-lg font-bold text-[#13243b]">Related Project</h2>
-            <div className="max-w-xl">
-              <ProjectCard project={project} detailsHref="/citizen/projects" />
-            </div>
-          </section>
-        )}
       </PageContainer>
     </CitizenLayout>
   )

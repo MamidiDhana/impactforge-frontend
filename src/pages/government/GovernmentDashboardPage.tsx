@@ -1,178 +1,374 @@
-import { AlertTriangle, BarChart3, ClipboardCheck, FileSearch, FolderKanban, ShieldCheck, Users } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import {
+  FileSearch,
+  Clock,
+  CheckCircle2,
+  MapPin,
+  RefreshCw,
+  AlertTriangle,
+  AlertCircle,
+  FolderKanban,
+} from 'lucide-react'
 import { GovernmentLayout } from '../../layouts/GovernmentLayout'
-import { GovPage } from './GovernmentShared'
+import { GovPage, isCitizenSubmittedReport } from './GovernmentShared'
 import { StatCard } from '../../components/common/StatCard'
 import { DashboardWelcome } from '../../components/dashboard/DashboardWelcome'
 import { SectionHeader } from '../../components/common/SectionHeader'
-import { useProblems } from '../../context/ProblemContext'
-
-const statusSummary = [{ label: 'Submitted', value: 14, color: 'bg-indigo-500' }, { label: 'Under Review', value: 12, color: 'bg-sky-500' }, { label: 'Validated', value: 24, color: 'bg-emerald-500' }, { label: 'Rejected', value: 4, color: 'bg-red-500' }, { label: 'Redirected', value: 3, color: 'bg-violet-500' }, { label: 'Converted to Project', value: 7, color: 'bg-teal-500' }]
+import { ErrorState } from '../../components/common/ErrorState'
+import { EmptyState } from '../../components/common/EmptyState'
+import { LoadingState } from '../../components/common/LoadingState'
+import { GovernmentReportFilters } from '../../components/government/GovernmentReportFilters'
+import { GovernmentReportsTable } from '../../components/government/GovernmentReportsTable'
+import { GovernmentReportDetailsModal } from '../../components/government/GovernmentReportDetailsModal'
+import { AnnouncementBanner } from '../../components/notifications/AnnouncementBanner'
+import {
+  getReports,
+  updateReportStatus,
+  deduplicateReports,
+  type BackendReportResponse,
+} from '../../services/reportService'
 
 export function GovernmentDashboardPage() {
-  const navigate = useNavigate()
-  const { problems } = useProblems()
+  const [reports, setReports] = useState<BackendReportResponse[]>([])
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [selectedReport, setSelectedReport] = useState<BackendReportResponse | null>(null)
+
+  // Status update states
+  const [isUpdatingTrackId, setIsUpdatingTrackId] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null)
+
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [selectedUrgency, setSelectedUrgency] = useState<string>('')
+  const [selectedStatus, setSelectedStatus] = useState<string>('')
+
+  // Load citizen reports from the backend: GET /api/reports
+  const loadReports = useCallback(async () => {
+    setIsLoading(true)
+    setFetchError(null)
+
+    try {
+      const data = await getReports()
+      // Display ONLY actual problems/reports submitted from the Citizen Portal
+      const citizenReports = data.filter(isCitizenSubmittedReport)
+      setReports(citizenReports)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to connect to backend server.'
+      setFetchError(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadReports()
+  }, [loadReports])
+
+  // Handle status update: PATCH /api/reports/{track_id}/status
+  const handleUpdateStatus = async (
+    trackId: string,
+    newStatus: 'Open' | 'In Progress' | 'Resolved' | 'Rejected'
+  ) => {
+    setIsUpdatingTrackId(trackId)
+    setStatusUpdateError(null)
+
+    try {
+      const updated = await updateReportStatus(trackId, newStatus)
+
+      // Immediately update in local state
+      setReports((prev) =>
+        prev.map((r) => (r.track_id === trackId ? { ...r, ...updated, status: newStatus } : r))
+      )
+
+      // If details modal is open for this report, update its state too
+      if (selectedReport && selectedReport.track_id === trackId) {
+        setSelectedReport((prev) => (prev ? { ...prev, ...updated, status: newStatus } : null))
+      }
+
+      setSuccessMessage(`Status for ${trackId} updated to "${newStatus}" successfully.`)
+      setTimeout(() => setSuccessMessage(null), 4000)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to update report status.'
+      setStatusUpdateError(msg)
+      setTimeout(() => setStatusUpdateError(null), 5000)
+      throw err
+    } finally {
+      setIsUpdatingTrackId(null)
+    }
+  }
+
+  /**
+   * DISPLAY-ONLY DEDUPLICATION FOR GOVERNMENT DASHBOARD:
+   *
+   * NOTE: This is a strictly DISPLAY-ONLY deduplication layer.
+   * Underlying citizen reports in the PostgreSQL database are INTENTIONALLY PRESERVED
+   * and never deleted. Every individual report remains fully accessible by its unique
+   * permanent Track ID (e.g. IF-JH-2026-XXXX).
+   *
+   * When multiple report records share the exact same problem title (after trimming
+   * leading/trailing whitespace), only ONE representative entry is displayed:
+   * 1. Prefer an active / open / unresolved report over an already resolved or rejected one.
+   * 2. If status priorities are equal, prefer the most recently updated or newest record.
+   * 3. Stable tiebreaker: deterministic track_id comparison.
+   *
+   * The original title text is preserved without changes.
+   */
+  const deduplicatedReports = useMemo(() => {
+    return deduplicateReports(reports)
+  }, [reports])
+
+  // Filtered reports calculation (applied to display-deduplicated list)
+  const filteredReports = useMemo(() => {
+    return deduplicatedReports.filter((report) => {
+      // Search filter (Track ID or title)
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim()
+        const matchId = report.track_id.toLowerCase().includes(q)
+        const matchTitle = report.problem_title.toLowerCase().includes(q)
+        if (!matchId && !matchTitle) return false
+      }
+
+      // District filter
+      if (selectedDistrict) {
+        if (report.district.toLowerCase() !== selectedDistrict.toLowerCase()) {
+          return false
+        }
+      }
+
+      // Category filter
+      if (selectedCategory) {
+        if (report.category.toLowerCase() !== selectedCategory.toLowerCase()) {
+          return false
+        }
+      }
+
+      // Urgency filter
+      if (selectedUrgency) {
+        if (report.priority.toLowerCase() !== selectedUrgency.toLowerCase()) {
+          return false
+        }
+      }
+
+      // Status filter
+      if (selectedStatus) {
+        if (report.status.toLowerCase() !== selectedStatus.toLowerCase()) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [deduplicatedReports, searchQuery, selectedDistrict, selectedCategory, selectedUrgency, selectedStatus])
+
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() || selectedDistrict || selectedCategory || selectedUrgency || selectedStatus
+  )
+
+  const handleResetFilters = () => {
+    setSearchQuery('')
+    setSelectedDistrict('')
+    setSelectedCategory('')
+    setSelectedUrgency('')
+    setSelectedStatus('')
+  }
+
+  // Live summary statistics directly derived from authoritative citizen reports
+  const stats = useMemo(() => {
+    const total = deduplicatedReports.length
+    const openCount = deduplicatedReports.filter((r) => r.status === 'Open').length
+    const inProgressCount = deduplicatedReports.filter((r) => r.status === 'In Progress').length
+    const resolvedCount = deduplicatedReports.filter((r) => r.status === 'Resolved').length
+    const rejectedCount = deduplicatedReports.filter((r) => r.status === 'Rejected').length
+    const districtCount = new Set(deduplicatedReports.map((r) => r.district.trim())).size
+
+    return {
+      total,
+      openCount,
+      inProgressCount,
+      resolvedCount,
+      rejectedCount,
+      districtCount,
+    }
+  }, [deduplicatedReports])
 
   return (
-    <GovernmentLayout title="Government">
+    <GovernmentLayout title="Government Dashboard">
       <GovPage
-        title="Government"
-        description="Review, validate, and monitor Jharkhand problems"
-        breadcrumbs={[{ label: 'Government' }]}
+        title="Government Operations Dashboard"
+        description="Monitor, review, and resolve verified community problems reported across all 24 Jharkhand districts."
+        breadcrumbs={[{ label: 'Government', href: '/government/dashboard' }]}
+        action={
+          <button
+            type="button"
+            onClick={loadReports}
+            disabled={isLoading}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:opacity-60"
+            title="Reload reports from backend"
+          >
+            <RefreshCw size={14} className={isLoading ? 'animate-spin text-[#187e8d]' : 'text-slate-600'} />
+            <span>{isLoading ? 'Fetching...' : 'Sync Live Data'}</span>
+          </button>
+        }
       >
-        <div className="space-y-8">
+        <div className="space-y-6">
+          {/* Active Role-Filtered Announcement Banner */}
+          <AnnouncementBanner />
+
+          {/* Welcome Banner */}
           <DashboardWelcome
-            name="Operations Overview"
-            description="Review community challenges from Ranchi, Jamshedpur, Dhanbad, and all Jharkhand districts. Validate genuine problems and assign Track IDs for HEI matching."
-            action={
-              <button
-                type="button"
-                onClick={() => navigate('/government/problem-queue')}
-                className="rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-[#12365a]"
-              >
-                Review pending problems
-              </button>
-            }
+            name="Jharkhand State Innovation Operations"
+            description="Central administrative portal for district officers to validate citizen problems, track real-time resolution stages, and dispatch challenges to state universities and engineering departments."
           />
+
+          {/* Feedback & Alert Banners */}
+          {successMessage && (
+            <div
+              role="status"
+              className="flex items-center gap-2.5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-bold text-emerald-800 shadow-sm animate-in fade-in"
+            >
+              <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+              <span>{successMessage}</span>
+            </div>
+          )}
+
+          {statusUpdateError && (
+            <div
+              role="alert"
+              className="flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-bold text-red-800 shadow-sm animate-in fade-in"
+            >
+              <AlertCircle size={18} className="text-red-600 shrink-0" />
+              <span>{statusUpdateError}</span>
+            </div>
+          )}
+
+          {/* Live Dynamic Statistics Grid */}
           <section>
-            <SectionHeader title="Summary overview" description="Jharkhand State Innovation Desk." />
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              <StatCard label="Total submissions" value="64" description="Across 24 districts" icon={FileSearch} />
-              <StatCard label="Pending validation" value="12" description="Awaiting officer review" icon={ClipboardCheck} />
-              <StatCard label="Validated problems" value="24" description="Approved for HEI matching" icon={ShieldCheck} />
-              <StatCard label="Rejected or redirected" value="7" description="Outside criteria" icon={AlertTriangle} />
-              <StatCard label="Active projects" value="14" description="BIT Mesra / NIT Jamshedpur" icon={FolderKanban} />
-              <StatCard label="Completed projects" value="2" description="Deployed solutions" icon={BarChart3} />
+            <SectionHeader
+              title="State Submissions Overview"
+              description="Real-time statistics calculated from citizen reports in PostgreSQL database."
+            />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              <StatCard
+                label="Problems"
+                value={String(stats.total)}
+                description="Live citizen reports"
+                icon={FileSearch}
+              />
+              <StatCard
+                label="Open / Pending"
+                value={String(stats.openCount)}
+                description="Awaiting review"
+                icon={Clock}
+              />
+              <StatCard
+                label="In Progress"
+                value={String(stats.inProgressCount)}
+                description="Active solution stage"
+                icon={FolderKanban}
+              />
+              <StatCard
+                label="Resolved"
+                value={String(stats.resolvedCount)}
+                description="Completed solutions"
+                icon={CheckCircle2}
+              />
+              <StatCard
+                label="Districts Active"
+                value={String(stats.districtCount)}
+                description="Out of 24 districts"
+                icon={MapPin}
+              />
             </div>
           </section>
-          <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-            <div>
-              <SectionHeader title="Problem status overview" description="Current state distribution." />
-              <div className="rounded-xl border border-slate-200 bg-white p-5">
-                <div className="space-y-4">
-                  {statusSummary.map((item) => (
-                    <div key={item.label}>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-slate-600">{item.label}</span>
-                        <strong className="text-[#13243b]">{item.value}</strong>
-                      </div>
-                      <div className="mt-2 h-2 rounded-full bg-slate-100">
-                        <div className={`h-full rounded-full ${item.color}`} style={{ width: `${(item.value / 64) * 100}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+
+          {/* Reports Table Section */}
+          <section className="space-y-4">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="font-[Manrope] text-lg font-bold text-[#13243b]">
+                  Registered Citizen Reports
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Detailed listing of problems submitted via the Citizen Portal.
+                </p>
               </div>
             </div>
-            <div>
-              <SectionHeader title="Impact snapshot" />
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                <div className="rounded-xl border border-[#b8dfe0] bg-[#e8f5f5] p-4">
-                  <Users className="text-[#187e8d]" size={19} />
-                  <p className="mt-3 text-xs uppercase text-slate-500">Panchayats & Towns Reached</p>
-                  <p className="mt-1 font-[Manrope] text-2xl font-bold text-[#13243b]">28</p>
-                </div>
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
-                  <p className="text-xs uppercase text-slate-500">Jharkhand Citizens Benefited</p>
-                  <p className="mt-1 font-[Manrope] text-2xl font-bold text-[#13243b]">31,400</p>
-                </div>
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
-                  <p className="text-xs uppercase text-slate-500">Problems resolved</p>
-                  <p className="mt-1 font-[Manrope] text-2xl font-bold text-[#13243b]">9</p>
-                </div>
+
+            {/* Filter and Search Bar */}
+            <GovernmentReportFilters
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              selectedDistrict={selectedDistrict}
+              onDistrictChange={setSelectedDistrict}
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+              selectedUrgency={selectedUrgency}
+              onUrgencyChange={setSelectedUrgency}
+              selectedStatus={selectedStatus}
+              onStatusChange={setSelectedStatus}
+              onResetFilters={handleResetFilters}
+              hasActiveFilters={hasActiveFilters}
+              totalCount={deduplicatedReports.length}
+              filteredCount={filteredReports.length}
+            />
+
+            {/* Main Content States */}
+            {isLoading ? (
+              <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+                <LoadingState rows={3} />
+                <p className="mt-3 text-xs text-slate-400">Loading citizen reports from PostgreSQL backend...</p>
               </div>
-            </div>
-          </section>
-          <section>
-            <SectionHeader title="Recent problem submissions" actionText="Open queue" onAction={() => navigate('/government/problem-queue')} />
-            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-              <table className="min-w-[760px] w-full text-left text-sm">
-                <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                  <tr>
-                    <th className="p-4">Track ID</th>
-                    <th className="p-4">Problem</th>
-                    <th className="p-4">Jharkhand Location</th>
-                    <th className="p-4">Category</th>
-                    <th className="p-4">Priority</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {problems.slice(0, 4).map((problem) => (
-                    <tr key={problem.id} className="border-b border-slate-100 last:border-0">
-                      <td className="p-4 font-mono text-xs font-bold text-[#12365a]">{problem.trackId}</td>
-                      <td className="p-4 font-semibold text-slate-700">{problem.title}</td>
-                      <td className="p-4 text-slate-500">{problem.district ? `${problem.district}, Jharkhand` : problem.location}</td>
-                      <td className="p-4 text-slate-500">{problem.category}</td>
-                      <td className="p-4">
-                        <span className="rounded-full bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-700">{problem.urgency || 'Medium'}</span>
-                      </td>
-                      <td className="p-4 text-slate-500">{problem.status}</td>
-                      <td className="p-4">
-                        <button type="button" onClick={() => navigate(`/government/problems/${problem.id}/review`)} className="font-semibold text-[#187e8d] hover:underline">
-                          Review
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <section>
-              <SectionHeader title="Pending review" />
-              <div className="grid gap-3">
-                {problems.slice(0, 3).map((problem) => (
-                  <div key={problem.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4">
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-xs font-bold text-[#12365a]">{problem.trackId}</span>
-                        <span className="text-slate-300">•</span>
-                        <h3 className="font-semibold text-[#13243b]">{problem.title}</h3>
-                      </div>
-                      <p className="mt-1 text-xs text-slate-500">{problem.district}, Jharkhand · Submitted {problem.submittedAt}</p>
-                    </div>
-                    <button type="button" onClick={() => navigate(`/government/problems/${problem.id}/review`)} className="text-sm font-semibold text-[#187e8d]">
-                      Review
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-            <section>
-              <SectionHeader title="Recent activity" />
-              <div className="rounded-xl border border-slate-200 bg-white p-5">
-                <ul className="space-y-4 text-sm text-slate-600">
-                  {['Problem validated in Ramgarh', 'More information requested for Latehar sub-centre', 'Problem redirected to Water Resources Dept', 'BIT Mesra matched with Arsenic filtration challenge', 'Gumla cold storage project milestone verified'].map((item, index) => (
-                    <li key={item} className="flex gap-3">
-                      <span className="mt-1.5 size-2 rounded-full bg-[#1c91a1]" />
-                      {item}
-                      <span className="ml-auto text-xs text-slate-400">{index + 1}h ago</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-          </div>
-          <section>
-            <SectionHeader title="Jharkhand District Alerts" />
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                'Ramgarh: High-urgency groundwater contamination challenge requires review',
-                'Latehar: 2 remote healthcare connectivity submissions awaiting validation',
-                'Dumka: Education bilingual learning project ready for field milestone inspection',
-                'Gumla: Cold storage prototype proposal submitted by NIT Jamshedpur',
-              ].map((alert) => (
-                <div key={alert} className="flex gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-                  <AlertTriangle size={17} className="shrink-0" />
-                  {alert}
-                </div>
-              ))}
-            </div>
+            ) : fetchError ? (
+              <ErrorState
+                title="Failed to Load Reports"
+                description={fetchError}
+                onRetry={loadReports}
+              />
+            ) : reports.length === 0 ? (
+              <EmptyState
+                icon={FileSearch}
+                title="No Citizen Reports Available"
+                description="No reports have been submitted through the Citizen Portal yet. When citizens report issues, they will appear here in real time."
+              />
+            ) : filteredReports.length === 0 ? (
+              <EmptyState
+                icon={AlertTriangle}
+                title="No Reports Match Filters"
+                description="No community challenges matched the selected search query and filter criteria."
+                action={
+                  <button
+                    type="button"
+                    onClick={handleResetFilters}
+                    className="rounded-lg bg-[#12365a] px-4 py-2 text-xs font-bold text-white shadow hover:bg-[#1a4a7a]"
+                  >
+                    Reset All Filters
+                  </button>
+                }
+              />
+            ) : (
+              <GovernmentReportsTable
+                reports={filteredReports}
+                onViewDetails={(report) => setSelectedReport(report)}
+                onUpdateStatus={handleUpdateStatus}
+                isUpdatingTrackId={isUpdatingTrackId}
+              />
+            )}
           </section>
         </div>
+
+        {/* View Details and Status Update Modal */}
+        {selectedReport && (
+          <GovernmentReportDetailsModal
+            report={selectedReport}
+            onClose={() => setSelectedReport(null)}
+            onUpdateStatus={handleUpdateStatus}
+            isUpdatingStatus={isUpdatingTrackId === selectedReport.track_id}
+          />
+        )}
       </GovPage>
     </GovernmentLayout>
   )

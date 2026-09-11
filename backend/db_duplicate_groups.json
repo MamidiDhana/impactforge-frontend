@@ -1,0 +1,1782 @@
+[
+  {
+    "title": "severe water contamination in namkum",
+    "district": "ranchi",
+    "locality": "namkum",
+    "category": "water and sanitation",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      2
+    ],
+    "track_ids": [
+      "IF-JH-2026-0002"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "contaminated drinking water at bundu block",
+    "district": "ramgarh",
+    "locality": "bundu",
+    "category": "water and sanitation",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      3
+    ],
+    "track_ids": [
+      "IF-JH-2026-0003"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "arsenic in groundwater tube wells",
+    "district": "ranchi",
+    "locality": "kanke",
+    "category": "water & sanitation",
+    "count": 80,
+    "is_duplicate_group": true,
+    "ids": [
+      606,
+      737,
+      738,
+      547,
+      548,
+      549,
+      550,
+      551,
+      552,
+      553,
+      554,
+      555,
+      607,
+      556,
+      667,
+      557,
+      558,
+      695,
+      559,
+      563,
+      698,
+      560,
+      561,
+      699,
+      562,
+      564,
+      565,
+      566,
+      668,
+      669,
+      700,
+      701,
+      670,
+      587,
+      588,
+      589,
+      591,
+      671,
+      672,
+      673,
+      674,
+      590,
+      594,
+      776,
+      702,
+      739,
+      740,
+      741,
+      742,
+      743,
+      592,
+      593,
+      585,
+      586,
+      608,
+      611,
+      609,
+      610,
+      612,
+      613,
+      614,
+      615,
+      775,
+      777,
+      781,
+      778,
+      779,
+      780,
+      784,
+      782,
+      783,
+      665,
+      666,
+      735,
+      694,
+      734,
+      736,
+      693,
+      696,
+      697
+    ],
+    "track_ids": [
+      "IF-JH-2026-2C3433",
+      "IF-JH-2026-C7337F",
+      "IF-JH-2026-A7F079",
+      "IF-JH-2026-F4294C",
+      "IF-JH-2026-C2EE22"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "ai integration verification: pipeline burst in namkum",
+    "district": "ranchi",
+    "locality": "namkum industrial area",
+    "category": "water and sanitation",
+    "count": 31,
+    "is_duplicate_group": true,
+    "ids": [
+      8,
+      10,
+      13,
+      16,
+      35,
+      19,
+      24,
+      29,
+      40,
+      100,
+      62,
+      49,
+      150,
+      86,
+      132,
+      222,
+      114,
+      178,
+      200,
+      264,
+      331,
+      421,
+      460,
+      298,
+      502,
+      382,
+      675,
+      716,
+      567,
+      655,
+      757
+    ],
+    "track_ids": [
+      "IF-JH-2026-0008",
+      "IF-JH-2026-0010",
+      "IF-JH-2026-0013",
+      "IF-JH-2026-0016",
+      "IF-JH-2026-0035"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      31
+    ]
+  },
+  {
+    "title": "ai failure resiliency test: streetlight issue",
+    "district": "ranchi",
+    "locality": "kanke road",
+    "category": "public safety",
+    "count": 31,
+    "is_duplicate_group": true,
+    "ids": [
+      9,
+      11,
+      14,
+      17,
+      36,
+      20,
+      25,
+      30,
+      41,
+      63,
+      50,
+      101,
+      87,
+      151,
+      133,
+      115,
+      223,
+      179,
+      201,
+      265,
+      332,
+      422,
+      461,
+      299,
+      383,
+      503,
+      676,
+      568,
+      717,
+      656,
+      758
+    ],
+    "track_ids": [
+      "IF-JH-2026-0009",
+      "IF-JH-2026-0011",
+      "IF-JH-2026-0014",
+      "IF-JH-2026-0017",
+      "IF-JH-2026-0036"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      54
+    ]
+  },
+  {
+    "title": "raw test problem without capabilities",
+    "district": "ranchi",
+    "locality": "morabadi",
+    "category": "roads and transport",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      244,
+      253,
+      520,
+      276,
+      478,
+      310,
+      343,
+      625,
+      400,
+      439,
+      595,
+      703,
+      744,
+      785
+    ],
+    "track_ids": [
+      "IF-JH-2026-TEST-0501D4",
+      "IF-JH-2026-TEST-9CA460",
+      "IF-JH-2026-TEST-874918",
+      "IF-JH-2026-TEST-6BE74F",
+      "IF-JH-2026-TEST-F12844"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "gov user private report",
+    "district": "ranchi",
+    "locality": "secretariat",
+    "category": "water and sanitation",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      246,
+      255,
+      522,
+      278,
+      480,
+      312,
+      345,
+      627,
+      402,
+      441,
+      597,
+      705,
+      746,
+      787
+    ],
+    "track_ids": [
+      "IF-JH-2026-OTHER-C5C250",
+      "IF-JH-2026-OTHER-1D8ABF",
+      "IF-JH-2026-OTHER-6B11F4",
+      "IF-JH-2026-OTHER-51FA36",
+      "IF-JH-2026-OTHER-40EF71"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "citizen's own problem report",
+    "district": "ranchi",
+    "locality": "doranda",
+    "category": "water and sanitation",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      247,
+      256,
+      279,
+      313,
+      346,
+      403,
+      628,
+      442,
+      481,
+      598,
+      523,
+      706,
+      747,
+      788
+    ],
+    "track_ids": [
+      "IF-JH-2026-MINE-71F6F2",
+      "IF-JH-2026-MINE-048583",
+      "IF-JH-2026-MINE-2ABCCF",
+      "IF-JH-2026-MINE-D577E7",
+      "IF-JH-2026-MINE-BA9A04"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "fallen tree blocking transit lane in morabadi",
+    "district": "ranchi",
+    "locality": "morabadi",
+    "category": "roads and transport",
+    "count": 20,
+    "is_duplicate_group": true,
+    "ids": [
+      58,
+      45,
+      54,
+      67,
+      96,
+      110,
+      146,
+      124,
+      196,
+      164,
+      218,
+      240,
+      293,
+      327,
+      360,
+      417,
+      456,
+      495,
+      540,
+      651
+    ],
+    "track_ids": [
+      "IF-JH-2026-0058",
+      "IF-JH-2026-0045",
+      "IF-JH-2026-0054",
+      "IF-JH-2026-0067",
+      "IF-JH-2026-0092"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      30
+    ]
+  },
+  {
+    "title": "blocked storm drain near kutchery road",
+    "district": "ranchi",
+    "locality": "kutchery road",
+    "category": "water and sanitation",
+    "count": 23,
+    "is_duplicate_group": true,
+    "ids": [
+      22,
+      27,
+      32,
+      38,
+      43,
+      52,
+      65,
+      94,
+      108,
+      122,
+      144,
+      162,
+      194,
+      216,
+      238,
+      291,
+      325,
+      358,
+      415,
+      454,
+      493,
+      538,
+      649
+    ],
+    "track_ids": [
+      "IF-JH-2026-0022",
+      "IF-JH-2026-0027",
+      "IF-JH-2026-0032",
+      "IF-JH-2026-0038",
+      "IF-JH-2026-0043"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      36
+    ]
+  },
+  {
+    "title": "gov problem report for faculty rec",
+    "district": "ranchi",
+    "locality": "kanke road",
+    "category": "roads and transport",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      248,
+      257,
+      599,
+      280,
+      314,
+      347,
+      404,
+      629,
+      443,
+      482,
+      524,
+      707,
+      748,
+      789
+    ],
+    "track_ids": [
+      "IF-JH-2026-GOVREC-B01C4E",
+      "IF-JH-2026-GOVREC-CD3C5A",
+      "IF-JH-2026-GOVREC-2D0402",
+      "IF-JH-2026-GOVREC-7C1567",
+      "IF-JH-2026-GOVREC-E3AF8F"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "gis survey requirement",
+    "district": "ranchi",
+    "locality": "kanke",
+    "category": "roads and transport",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      251,
+      262,
+      529,
+      285,
+      487,
+      319,
+      352,
+      409,
+      634,
+      448,
+      604,
+      712,
+      753,
+      794
+    ],
+    "track_ids": [
+      "IF-JH-2026-STUHEI-87CD88",
+      "IF-JH-2026-STUHEI-9D3939",
+      "IF-JH-2026-STUHEI-2BC38C",
+      "IF-JH-2026-STUHEI-09066A",
+      "IF-JH-2026-STUHEI-F90B47"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "primary health center medicine shortage in ormanjhi",
+    "district": "ranchi",
+    "locality": "ormanjhi",
+    "category": "healthcare",
+    "count": 23,
+    "is_duplicate_group": true,
+    "ids": [
+      23,
+      28,
+      33,
+      39,
+      44,
+      53,
+      66,
+      95,
+      109,
+      123,
+      145,
+      163,
+      195,
+      217,
+      239,
+      292,
+      326,
+      359,
+      416,
+      455,
+      494,
+      539,
+      650
+    ],
+    "track_ids": [
+      "IF-JH-2026-0023",
+      "IF-JH-2026-0028",
+      "IF-JH-2026-0033",
+      "IF-JH-2026-0039",
+      "IF-JH-2026-0044"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      32
+    ]
+  },
+  {
+    "title": "mining effluent runoff",
+    "district": "dhanbad",
+    "locality": "saraidhela",
+    "category": "water and sanitation",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      249,
+      260,
+      602,
+      283,
+      317,
+      350,
+      407,
+      632,
+      446,
+      485,
+      527,
+      710,
+      751,
+      792
+    ],
+    "track_ids": [
+      "IF-JH-2026-HEICROSS-7EE045",
+      "IF-JH-2026-HEICROSS-6EFDB1",
+      "IF-JH-2026-HEICROSS-905722",
+      "IF-JH-2026-HEICROSS-232E97",
+      "IF-JH-2026-HEICROSS-953E5A"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "drone mapping for urban road survey",
+    "district": "ranchi",
+    "locality": "harmu",
+    "category": "roads and transport",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      250,
+      261,
+      603,
+      284,
+      318,
+      351,
+      408,
+      633,
+      447,
+      486,
+      528,
+      711,
+      752,
+      793
+    ],
+    "track_ids": [
+      "IF-JH-2026-STUREC-78A254",
+      "IF-JH-2026-STUREC-EB5FC2",
+      "IF-JH-2026-STUREC-EA8F04",
+      "IF-JH-2026-STUREC-EF07FF",
+      "IF-JH-2026-STUREC-8768E6"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "sanitation pipeline issue",
+    "district": "ranchi",
+    "locality": "hinoo",
+    "category": "water and sanitation",
+    "count": 14,
+    "is_duplicate_group": true,
+    "ids": [
+      252,
+      263,
+      605,
+      286,
+      320,
+      353,
+      410,
+      635,
+      449,
+      488,
+      530,
+      713,
+      754,
+      795
+    ],
+    "track_ids": [
+      "IF-JH-2026-NOMUT-3CF5F7",
+      "IF-JH-2026-NOMUT-57E546",
+      "IF-JH-2026-NOMUT-BE9049",
+      "IF-JH-2026-NOMUT-9794F5",
+      "IF-JH-2026-NOMUT-DBA255"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "severe road cave-in and open drain near albert ekka chowk causing danger",
+    "district": "ranchi",
+    "locality": "albert ekka chowk",
+    "category": "roads and transport",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      34
+    ],
+    "track_ids": [
+      "IF-JH-2026-0034"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      79
+    ]
+  },
+  {
+    "title": "water logging in chutia colony lane",
+    "district": "ranchi",
+    "locality": "chutia",
+    "category": "water and sanitation",
+    "count": 20,
+    "is_duplicate_group": true,
+    "ids": [
+      59,
+      46,
+      55,
+      68,
+      197,
+      97,
+      111,
+      125,
+      147,
+      165,
+      219,
+      241,
+      294,
+      328,
+      361,
+      418,
+      457,
+      496,
+      541,
+      652
+    ],
+    "track_ids": [
+      "IF-JH-2026-0059",
+      "IF-JH-2026-0046",
+      "IF-JH-2026-0055",
+      "IF-JH-2026-0068",
+      "IF-JH-2026-0179"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      54
+    ]
+  },
+  {
+    "title": "quantum telescope astronomical observational sensor calibration anomaly",
+    "district": "simdega",
+    "locality": "remote border hamlet",
+    "category": "education",
+    "count": 2,
+    "is_duplicate_group": true,
+    "ids": [
+      81,
+      89
+    ],
+    "track_ids": [
+      "IF-JH-2026-0079",
+      "IF-JH-2026-0086"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      40
+    ]
+  },
+  {
+    "title": "broken handpump in village courtyard",
+    "district": "ranchi",
+    "locality": "ormanjhi",
+    "category": "water and sanitation",
+    "count": 18,
+    "is_duplicate_group": true,
+    "ids": [
+      128,
+      135,
+      153,
+      181,
+      203,
+      225,
+      640,
+      267,
+      334,
+      301,
+      424,
+      385,
+      463,
+      505,
+      570,
+      678,
+      719,
+      760
+    ],
+    "track_ids": [
+      "IF-JH-2026-0122",
+      "IF-JH-2026-0129",
+      "IF-JH-2026-0146",
+      "IF-JH-2026-0167",
+      "IF-JH-2026-0185"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      26,
+      54
+    ]
+  },
+  {
+    "title": "broken bridge railing on subarnarekha bridge",
+    "district": "ranchi",
+    "locality": "namkum",
+    "category": "roads and transport",
+    "count": 20,
+    "is_duplicate_group": true,
+    "ids": [
+      60,
+      47,
+      56,
+      69,
+      198,
+      98,
+      112,
+      126,
+      166,
+      148,
+      220,
+      242,
+      295,
+      329,
+      362,
+      419,
+      458,
+      497,
+      542,
+      653
+    ],
+    "track_ids": [
+      "IF-JH-2026-0060",
+      "IF-JH-2026-0047",
+      "IF-JH-2026-0056",
+      "IF-JH-2026-0069",
+      "IF-JH-2026-0180"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      54
+    ]
+  },
+  {
+    "title": "major water pipe burst flooding residential lane",
+    "district": "ranchi",
+    "locality": "kanke",
+    "category": "water and sanitation",
+    "count": 23,
+    "is_duplicate_group": true,
+    "ids": [
+      91,
+      83,
+      73,
+      78,
+      273,
+      105,
+      119,
+      141,
+      159,
+      187,
+      209,
+      231,
+      307,
+      340,
+      397,
+      436,
+      475,
+      772,
+      517,
+      646,
+      582,
+      731,
+      690
+    ],
+    "track_ids": [
+      "IF-JH-2026-0088",
+      "IF-JH-2026-0081",
+      "IF-JH-2026-0073",
+      "IF-JH-2026-0077",
+      "IF-JH-2026-0266"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      41,
+      58
+    ]
+  },
+  {
+    "title": "unsafe live electrical cable hanging low over market square",
+    "district": "ranchi",
+    "locality": "hinoo",
+    "category": "public safety",
+    "count": 18,
+    "is_duplicate_group": true,
+    "ids": [
+      61,
+      70,
+      363,
+      99,
+      113,
+      199,
+      127,
+      149,
+      167,
+      221,
+      243,
+      296,
+      330,
+      420,
+      459,
+      498,
+      543,
+      654
+    ],
+    "track_ids": [
+      "IF-JH-2026-0061",
+      "IF-JH-2026-0070",
+      "IF-JH-2026-0351",
+      "IF-JH-2026-0095",
+      "IF-JH-2026-0108"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      66
+    ]
+  },
+  {
+    "title": "manhole cover missing on footpath",
+    "district": "ranchi",
+    "locality": "lalpur",
+    "category": "public safety",
+    "count": 22,
+    "is_duplicate_group": true,
+    "ids": [
+      92,
+      84,
+      74,
+      106,
+      274,
+      120,
+      142,
+      160,
+      188,
+      210,
+      232,
+      308,
+      341,
+      398,
+      773,
+      437,
+      476,
+      518,
+      647,
+      583,
+      691,
+      732
+    ],
+    "track_ids": [
+      "IF-JH-MUT-1d7c5e",
+      "IF-JH-MUT-fe0d1d",
+      "IF-JH-TEST-DUP-01",
+      "IF-JH-MUT-7b3826",
+      "IF-JH-MUT-81712e"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "unsafe live electrical cable hanging over primary school gate",
+    "district": "ranchi",
+    "locality": "hinoo",
+    "category": "public safety",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      48
+    ],
+    "track_ids": [
+      "IF-JH-2026-0048"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      93
+    ]
+  },
+  {
+    "title": "water quality issue in morabadi",
+    "district": "ranchi",
+    "locality": "morabadi",
+    "category": "water and sanitation",
+    "count": 13,
+    "is_duplicate_group": true,
+    "ids": [
+      258,
+      525,
+      281,
+      483,
+      315,
+      348,
+      630,
+      405,
+      444,
+      600,
+      708,
+      749,
+      790
+    ],
+    "track_ids": [
+      "IF-JH-2026-FACSELF-4F4119",
+      "IF-JH-2026-FACSELF-7485A0",
+      "IF-JH-2026-FACSELF-AD5B4E",
+      "IF-JH-2026-FACSELF-101AE9",
+      "IF-JH-2026-FACSELF-570BCD"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "quantum telescope astronomical observational sensor calibration anomaly",
+    "district": "ranchi",
+    "locality": "bit mesra campus",
+    "category": "education",
+    "count": 2,
+    "is_duplicate_group": true,
+    "ids": [
+      71,
+      76
+    ],
+    "track_ids": [
+      "IF-JH-2026-0071",
+      "IF-JH-2026-0075"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      40
+    ]
+  },
+  {
+    "title": "major water pipe leak flooding residential lane",
+    "district": "ranchi",
+    "locality": "kanke",
+    "category": "water and sanitation",
+    "count": 23,
+    "is_duplicate_group": true,
+    "ids": [
+      72,
+      82,
+      77,
+      90,
+      104,
+      118,
+      186,
+      140,
+      158,
+      208,
+      230,
+      272,
+      339,
+      306,
+      396,
+      581,
+      474,
+      435,
+      516,
+      771,
+      645,
+      689,
+      730
+    ],
+    "track_ids": [
+      "IF-JH-2026-0072",
+      "IF-JH-2026-0080",
+      "IF-JH-2026-0076",
+      "IF-JH-2026-0087",
+      "IF-JH-2026-0100"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      41
+    ]
+  },
+  {
+    "title": "pavement breakdown",
+    "district": "jamshedpur",
+    "locality": "bistupur",
+    "category": "roads and transport",
+    "count": 13,
+    "is_duplicate_group": true,
+    "ids": [
+      259,
+      601,
+      282,
+      316,
+      349,
+      406,
+      631,
+      445,
+      484,
+      526,
+      709,
+      750,
+      791
+    ],
+    "track_ids": [
+      "IF-JH-2026-FACOTH-101DC9",
+      "IF-JH-2026-FACOTH-0C844C",
+      "IF-JH-2026-FACOTH-CE7C7F",
+      "IF-JH-2026-FACOTH-C8A38D",
+      "IF-JH-2026-FACOTH-13BFC7"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "unsafe live electrical cable hanging low over market road",
+    "district": "ranchi",
+    "locality": "hinoo",
+    "category": "public safety",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      57
+    ],
+    "track_ids": [
+      "IF-JH-2026-0057"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      73
+    ]
+  },
+  {
+    "title": "resilience test for hei matching",
+    "district": "ranchi",
+    "locality": "kanke",
+    "category": "water and sanitation",
+    "count": 15,
+    "is_duplicate_group": true,
+    "ids": [
+      169,
+      171,
+      173,
+      177,
+      193,
+      215,
+      237,
+      290,
+      324,
+      357,
+      414,
+      453,
+      492,
+      534,
+      639
+    ],
+    "track_ids": [
+      "IF-JH-2026-0160",
+      "IF-JH-2026-0161",
+      "IF-JH-2026-0162",
+      "IF-JH-2026-0163",
+      "IF-JH-2026-0175"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      48
+    ]
+  },
+  {
+    "title": "open high voltage electrical wire sparking creating hazard",
+    "district": "ranchi",
+    "locality": "hinoo",
+    "category": "public safety",
+    "count": 41,
+    "is_duplicate_group": true,
+    "ids": [
+      85,
+      75,
+      80,
+      93,
+      131,
+      107,
+      121,
+      138,
+      156,
+      143,
+      161,
+      508,
+      184,
+      206,
+      189,
+      228,
+      211,
+      233,
+      270,
+      275,
+      337,
+      304,
+      477,
+      342,
+      309,
+      763,
+      388,
+      399,
+      427,
+      466,
+      438,
+      643,
+      519,
+      573,
+      648,
+      584,
+      681,
+      774,
+      722,
+      733,
+      692
+    ],
+    "track_ids": [
+      "IF-JH-2026-0082",
+      "IF-JH-2026-0074",
+      "IF-JH-2026-0078",
+      "IF-JH-2026-0089",
+      "IF-JH-2026-0125"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      66,
+      93
+    ]
+  },
+  {
+    "title": "blocked storm drain flooding commercial plaza",
+    "district": "ranchi",
+    "locality": "main road",
+    "category": "water and sanitation",
+    "count": 18,
+    "is_duplicate_group": true,
+    "ids": [
+      129,
+      386,
+      136,
+      154,
+      182,
+      204,
+      226,
+      268,
+      335,
+      302,
+      425,
+      464,
+      641,
+      506,
+      571,
+      679,
+      720,
+      761
+    ],
+    "track_ids": [
+      "IF-JH-2026-0123",
+      "IF-JH-2026-0356",
+      "IF-JH-2026-0130",
+      "IF-JH-2026-0147",
+      "IF-JH-2026-0168"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      54
+    ]
+  },
+  {
+    "title": "damaged pedestrian footbridge over railway line",
+    "district": "ranchi",
+    "locality": "station road",
+    "category": "roads and transport",
+    "count": 18,
+    "is_duplicate_group": true,
+    "ids": [
+      130,
+      137,
+      155,
+      183,
+      205,
+      387,
+      227,
+      269,
+      336,
+      303,
+      426,
+      465,
+      642,
+      507,
+      572,
+      680,
+      721,
+      762
+    ],
+    "track_ids": [
+      "IF-JH-2026-0124",
+      "IF-JH-2026-0131",
+      "IF-JH-2026-0148",
+      "IF-JH-2026-0169",
+      "IF-JH-2026-0187"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      27,
+      36
+    ]
+  },
+  {
+    "title": "quantum telescope sensor calibration anomaly",
+    "district": "simdega",
+    "locality": "remote border hamlet",
+    "category": "education",
+    "count": 19,
+    "is_duplicate_group": true,
+    "ids": [
+      103,
+      117,
+      139,
+      157,
+      185,
+      207,
+      229,
+      515,
+      271,
+      338,
+      305,
+      395,
+      580,
+      434,
+      473,
+      770,
+      644,
+      688,
+      729
+    ],
+    "track_ids": [
+      "IF-JH-2026-0099",
+      "IF-JH-2026-0112",
+      "IF-JH-2026-0133",
+      "IF-JH-2026-0150",
+      "IF-JH-2026-0171"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      40,
+      12
+    ]
+  },
+  {
+    "title": "other citizen problem",
+    "district": "ranchi",
+    "locality": "doranda",
+    "category": "roads and transport",
+    "count": 11,
+    "is_duplicate_group": true,
+    "ids": [
+      174,
+      212,
+      287,
+      234,
+      321,
+      354,
+      411,
+      450,
+      636,
+      531,
+      489
+    ],
+    "track_ids": [
+      "IF-JH-OTHER-HEI-01",
+      "IF-JH-OTHER-0d3166",
+      "IF-JH-OTHER-eb5b61",
+      "IF-JH-OTHER-c14f29",
+      "IF-JH-OTHER-be01c6"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "citizen own problem for hei",
+    "district": "ranchi",
+    "locality": "morabadi",
+    "category": "water and sanitation",
+    "count": 11,
+    "is_duplicate_group": true,
+    "ids": [
+      175,
+      288,
+      213,
+      235,
+      322,
+      355,
+      412,
+      451,
+      532,
+      490,
+      637
+    ],
+    "track_ids": [
+      "IF-JH-OWN-HEI-02",
+      "IF-JH-OWN-825eb7",
+      "IF-JH-OWN-6e4fbf",
+      "IF-JH-OWN-67a804",
+      "IF-JH-OWN-932f99"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "gov hei review report",
+    "district": "ranchi",
+    "locality": "harmu",
+    "category": "water and sanitation",
+    "count": 11,
+    "is_duplicate_group": true,
+    "ids": [
+      176,
+      289,
+      214,
+      236,
+      323,
+      491,
+      356,
+      413,
+      452,
+      533,
+      638
+    ],
+    "track_ids": [
+      "IF-JH-GOV-HEI-03",
+      "IF-JH-GOV-b113ee",
+      "IF-JH-GOV-1db1b0",
+      "IF-JH-GOV-4e75da",
+      "IF-JH-GOV-697ac7"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "automated verification test: water issue in ranchi",
+    "district": "ranchi",
+    "locality": "morabadi",
+    "category": "water and sanitation",
+    "count": 36,
+    "is_duplicate_group": true,
+    "ids": [
+      202,
+      718,
+      5,
+      6,
+      7,
+      12,
+      15,
+      18,
+      21,
+      26,
+      31,
+      37,
+      42,
+      51,
+      64,
+      88,
+      102,
+      116,
+      134,
+      152,
+      180,
+      224,
+      266,
+      297,
+      300,
+      333,
+      384,
+      423,
+      462,
+      504,
+      569,
+      657,
+      664,
+      677,
+      755,
+      759
+    ],
+    "track_ids": [
+      "IF-JH-2026-0184",
+      "IF-JH-2026-0627",
+      "IF-JH-2026-0005",
+      "IF-JH-2026-0006",
+      "IF-JH-2026-0007"
+    ],
+    "statuses": [
+      "In Progress"
+    ],
+    "verifications": [
+      "Verified"
+    ],
+    "ai_priority_scores": [
+      48,
+      12
+    ]
+  },
+  {
+    "title": "drinking water",
+    "district": "ranchi",
+    "locality": "ranchi",
+    "category": "water and sanitation",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      714
+    ],
+    "track_ids": [
+      "IF-JH-2026-0623"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      48
+    ]
+  },
+  {
+    "title": "arsenic in community borehole wells",
+    "district": "ranchi",
+    "locality": "kanke",
+    "category": "water & sanitation",
+    "count": 6,
+    "is_duplicate_group": true,
+    "ids": [
+      658,
+      661,
+      662,
+      659,
+      660,
+      663
+    ],
+    "track_ids": [
+      "IF-JH-2026-BBD372",
+      "IF-JH-2026-AA150F",
+      "IF-JH-2026-FA1D55",
+      "IF-JH-2026-1F818D",
+      "IF-JH-2026-C06ED2"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "overflow of drinage systems",
+    "district": "khunti",
+    "locality": "khunti",
+    "category": "water and sanitation",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      715
+    ],
+    "track_ids": [
+      "IF-JH-2026-0624"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      36
+    ]
+  },
+  {
+    "title": "no clean drinking water available",
+    "district": "ranchi",
+    "locality": "morabadi",
+    "category": "water / facilities",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      1
+    ],
+    "track_ids": [
+      "IF-JH-2026-0001"
+    ],
+    "statuses": [
+      "In Progress"
+    ],
+    "verifications": [
+      "Verified"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "water pipeline leak in doranda, ranchi",
+    "district": "ranchi",
+    "locality": "doranda",
+    "category": "water and sanitation",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      4
+    ],
+    "track_ids": [
+      "IF-JH-2026-0004"
+    ],
+    "statuses": [
+      "In Progress"
+    ],
+    "verifications": [
+      "Verified"
+    ],
+    "ai_priority_scores": []
+  },
+  {
+    "title": "crop disease detection and early farmer support",
+    "district": "dhanbad",
+    "locality": "dhanbad",
+    "category": "agriculture",
+    "count": 1,
+    "is_duplicate_group": false,
+    "ids": [
+      756
+    ],
+    "track_ids": [
+      "IF-JH-2026-0658"
+    ],
+    "statuses": [
+      "Open"
+    ],
+    "verifications": [
+      "Pending Verification"
+    ],
+    "ai_priority_scores": [
+      20
+    ]
+  }
+]
